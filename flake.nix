@@ -15,7 +15,7 @@
     home-manager.inputs.nixpkgs.follows = "nixpkgs-unstable";
   };
 
-  outputs = { self, darwin, nixpkgs, flake-utils, home-manager, ... }@inputs:
+  outputs = { self, darwin, nixpkgs, flake-utils, home-manager,  ... }@inputs:
     let
       inherit (darwin.lib) darwinSystem;
       inherit (inputs.nixpkgs.lib) attrValues makeOverridable optionalAttrs singleton;
@@ -62,7 +62,7 @@
                     inherit system;
                     modules = attrValues self.darwinModules ++ [
                       # nix-darwin configuration
-                      ./darwin-configuration.nix
+                      ./systems/nix-darwin/recalune
                       # home-manager
                       home-manager.darwinModules.home-manager
                       {
@@ -70,15 +70,14 @@
                         # `home-manager` config
                         home-manager.useGlobalPkgs = true;
                         home-manager.useUserPackages = true;
-                        home-manager.users.recalune = import ./home.nix;
+                        home-manager.users.recalune = import ./home-manager/recalune.nix;
                       }
                       # tailscale
-                      ./tailscale.nix
+                      ./services/tailscale
                     ];
                     # inputs = { inherit darwin nixpkgs; };
                     inputs = { inherit darwin; };
                   };
-                ITID001178-MAC = recalune;
               };
             };
 

@@ -15,7 +15,7 @@ in
         ProgramArguments = [
           "/bin/sh"
           "-c"
-          "/bin/wait4path ${cfg.package} &amp;&amp; sudo ${cfg.package}/bin/tailscale up"
+          "/bin/wait4path ${cfg.package} &amp;&amp; sleep 10 &amp;&amp; sudo ${cfg.package}/bin/tailscale up"
         ];
         RunAtLoad = true;
         KeepAlive = {

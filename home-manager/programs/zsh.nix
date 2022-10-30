@@ -1,0 +1,40 @@
+{ config, pkgs, ... }:
+{
+    programs.zsh = {
+      enable = true;
+      completionInit = ''
+        autoload -Uz compinit && compinit -i
+      '';
+      initExtraBeforeCompInit = ''
+        ZSH_DISABLE_COMPFIX=true
+      '';
+      initExtraFirst = ''
+        # Fig pre block. Keep at the top of this file.
+        [[ -f "$HOME/.fig/shell/zshrc.pre.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.pre.zsh"
+      '';
+      initExtra = ''
+        export GPG_TTY=$(tty)
+        gpgconf --launch gpg-agent
+
+        # Fig post block. Keep at the bottom of this file.
+        [[ -f "$HOME/.fig/shell/zshrc.post.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.post.zsh"
+      '';
+      oh-my-zsh = {
+        enable = true;
+        plugins = [
+          "git"
+          "kubectl"
+          "docker"
+          "docker-compose"
+        ];
+        theme = "robbyrussell";
+      };
+      shellAliases = {
+        hm = "home-manager";
+        hms = "home-manager switch";
+        hmb = "home-manager build";
+        drs = "darwin-rebuild switch";
+        drb = "darwin-rebuild build";
+      };
+    };
+}
