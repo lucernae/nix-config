@@ -57,27 +57,47 @@
           packages =
             {
               darwinConfigurations = rec {
-                recalune =
-                  darwinSystem {
-                    inherit system;
-                    modules = attrValues self.darwinModules ++ [
-                      # nix-darwin configuration
-                      ./systems/nix-darwin/recalune
-                      # home-manager
-                      home-manager.darwinModules.home-manager
-                      {
-                        nixpkgs = nixpkgsConfig;
-                        # `home-manager` config
-                        home-manager.useGlobalPkgs = true;
-                        home-manager.useUserPackages = true;
-                        home-manager.users.recalune = import ./home-manager/recalune.nix;
-                      }
-                      # tailscale
-                      ./services/tailscale
-                    ];
-                    # inputs = { inherit darwin nixpkgs; };
-                    inputs = { inherit darwin; };
-                  };
+                recalune = darwinSystem {
+                  inherit system;
+                  modules = attrValues self.darwinModules ++ [
+                    # nix-darwin configuration
+                    ./systems/nix-darwin/recalune
+                    # home-manager
+                    home-manager.darwinModules.home-manager
+                    {
+                      nixpkgs = nixpkgsConfig;
+                      # `home-manager` config
+                      home-manager.useGlobalPkgs = true;
+                      home-manager.useUserPackages = true;
+                      home-manager.users.recalune = import ./home-manager/recalune.nix;
+                    }
+                    # tailscale
+                    ./services/tailscale
+                  ];
+                  # inputs = { inherit darwin nixpkgs; };
+                  inputs = { inherit darwin; };
+                };
+
+                maul = darwinSystem {
+                  inherit system;
+                  modules = attrValues self.darwinModules ++ [
+                    # nix-darwin configuration
+                    ./systems/nix-darwin/maul
+                    # home-manager
+                    home-manager.darwinModules.home-manager
+                    {
+                      nixpkgs = nixpkgsConfig;
+                      # `home-manager` config
+                      home-manager.useGlobalPkgs = true;
+                      home-manager.useUserPackages = true;
+                      home-manager.users.recalune = import ./home-manager/maul.nix;
+                    }
+                    # tailscale
+                    ./services/tailscale
+                  ];
+                  # inputs = { inherit darwin nixpkgs; };
+                  inputs = { inherit darwin; };
+                };
               };
             };
 

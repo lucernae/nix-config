@@ -37,8 +37,8 @@
   # programs.fish.enable = true;
 
   users.users.recalune = {
-    name = "maul";
-    home = "/Users/maul";
+    name = "recalune";
+    home = "/Users/recalune";
   };
 
   environment.pathsToLink = [
