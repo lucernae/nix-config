@@ -36,9 +36,9 @@
   programs.zsh.enable = true; # default shell on catalina
   # programs.fish.enable = true;
 
-  users.users.recalune = {
-    name = "recalune";
-    home = "/Users/recalune";
+  users.users.maul = {
+    name = "maul";
+    home = "/Users/maul";
   };
 
   environment.pathsToLink = [

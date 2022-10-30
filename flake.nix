@@ -90,7 +90,7 @@
                       # `home-manager` config
                       home-manager.useGlobalPkgs = true;
                       home-manager.useUserPackages = true;
-                      home-manager.users.recalune = import ./home-manager/maul.nix;
+                      home-manager.users.maul = import ./home-manager/maul.nix;
                     }
                     # tailscale
                     ./services/tailscale
