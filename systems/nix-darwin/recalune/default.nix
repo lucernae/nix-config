@@ -1,6 +1,18 @@
 { config, pkgs, home-manager, ... }:
 {
   nix = {
+    buildMachines = [{
+        hostName = "aarch64-darwin-builder";
+        system = "aarch64-darwin";
+        maxJobs = 1;
+        speedFactor = 2;
+    }];
+    distributedBuilds = true;
+    settings.trusted-users = [
+      "@admin"
+      "@wheel"
+    ];
+    settings.builders-use-substitutes = true;
     settings.experimental-features = [
       "nix-command"
       "flakes"
@@ -16,9 +28,9 @@
   # $ nix-env -qaP | grep wget
   environment.systemPackages =
     [
-      pkgs.vim
-      pkgs.zsh
-      pkgs.bash
+      # pkgs.vim
+      # pkgs.zsh
+      # pkgs.bash
       pkgs.home-manager
       pkgs.tailscale
     ];
@@ -33,7 +45,7 @@
   # nix.package = pkgs.nix;
 
   # Create /etc/zshrc that loads the nix-darwin environment.
-  programs.zsh.enable = true; # default shell on catalina
+  # programs.zsh.enable = true; # default shell on catalina
   # programs.fish.enable = true;
 
   users.users.recalune = {
@@ -41,9 +53,9 @@
     home = "/Users/recalune";
   };
 
-  environment.pathsToLink = [
-    "/usr/share/zsh"
-  ];
+  # environment.pathsToLink = [
+  #   "/usr/share/zsh"
+  # ];
 
   security.pam.enableSudoTouchIdAuth = true;
 
