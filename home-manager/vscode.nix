@@ -8,10 +8,8 @@
   imports = [
     ./home.nix
     ./programs/direnv.nix
-    ./programs/git.nix
-    ./programs/gpg.nix
+    ./programs/git-vscode.nix
     ./programs/zsh.nix
-    ./services/gpg-agent.nix
   ];
 
 }

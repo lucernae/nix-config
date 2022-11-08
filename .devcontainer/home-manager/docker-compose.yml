@@ -25,6 +25,8 @@ services:
       # Uncomment the next line to use Docker from inside the container. See https://aka.ms/vscode-remote/samples/docker-from-docker-compose for details.
       # - /var/run/docker.sock:/var/run/docker.sock
 
+    hostname: devcontainer
+
     environment:
       NIX_MULTI_USER: "true"
       NIX_REMOTE: "daemon"
