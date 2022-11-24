@@ -67,11 +67,12 @@
       "jq"
       "yq"
       "mas"
+      "dagger"
     ];
     casks = [
       "fig"
       "cron"
-      "visual-studio-code"
+      # "visual-studio-code" maintained by home-manager
       "docker"
     ];
   };

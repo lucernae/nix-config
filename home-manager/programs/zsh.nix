@@ -27,13 +27,29 @@
           "docker"
           "docker-compose"
         ];
-        theme = "robbyrussell";
+        theme = "bira";
+      };
+      prezto = {
+        enable = false;
+        pmodules = [
+          "autosuggestions"
+          "completion"
+          "directory"
+          "editor"
+          "git"
+          "kubectl"
+          "docker"
+          "docker-compose"
+          "terminal"
+        ];
       };
       shellAliases = {
         hm = "home-manager";
         hms = "home-manager switch";
+        hmsf = "home-manager switch --flake ~/.config/nix-config/home-manager";
         hmb = "home-manager build";
         drs = "darwin-rebuild switch";
+        drsf = "darwin-rebuild switch --flake ~/.config/nix-config";
         drb = "darwin-rebuild build";
       };
     };

@@ -23,7 +23,10 @@
     ] (
         system: 
             let
-                pkgs = nixpkgs.legacyPackages.${system};
+                pkgs = import nixpkgs {
+                    inherit system;
+                    config.allowUnfree = true;
+                };
             in
             rec {
             packages.homeConfigurations.recalune = home-manager.lib.homeManagerConfiguration {
@@ -32,7 +35,7 @@
                 # Specify your home configuration modules here, for example,
                 # the path to your home.nix.
                 modules = [
-                ./recalune.nix
+                    ./recalune.nix
                 ];
             };
             packages.homeConfigurations.vscode = home-manager.lib.homeManagerConfiguration {

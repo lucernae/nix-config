@@ -10,6 +10,7 @@
       };
       extraConfig = {
         core.editor = "vim";
+        init.defaultBranch = "main";
         safe.directory = [
           "/usr/local/Homebrew"
           "/usr/local/Homebrew/Library/Taps/homebrew/homebrew-bundle"

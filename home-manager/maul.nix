@@ -11,6 +11,7 @@
     ./programs/git.nix
     ./programs/gpg.nix
     ./programs/zsh.nix
+    ./programs/vscode.nix
     ./services/gpg-agent.nix
   ];
 
