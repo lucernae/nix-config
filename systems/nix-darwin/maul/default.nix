@@ -63,6 +63,13 @@
   # home-manager.useGlobalPkgs = true;
   # home-manager.useUserPackages = true;
   # home-manager.users.recalune = import ./home.nix;
+  
+  system.activationScripts.fixZshPermissions = pkgs.runCommand ''
+    compaudit | xargs sudo chown root:admin
+  '';
+  system.activationScripts.restartGPGAgent = pkgs.runCommand ''
+    pkill gpg-agent
+  ''
 
   # Used for backwards compatibility, please read the changelog before changing.
   # $ darwin-rebuild changelog
