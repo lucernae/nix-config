@@ -1,18 +1,26 @@
 { config, pkgs, home-manager, ... }:
 {
   nix = {
-    buildMachines = [{
+    buildMachines = [
+      {
         hostName = "aarch64-darwin-builder";
-        system = "aarch64-darwin";
+        systems = [ "aarch64-darwin" "x86_64-darwin" ];
         maxJobs = 1;
         speedFactor = 2;
-    }];
+      }
+      {
+        hostName = "linux-builder";
+        systems = [ "x86_64-linux" "aarch64-linux" ];
+        maxJobs = 1;
+        speedFactor = 2;
+      }
+    ];
     distributedBuilds = true;
     settings.trusted-users = [
       "@admin"
       "@wheel"
     ];
-    settings.builders-use-substitutes = true;
+    settings.builders-use-substitutes = false;
     settings.experimental-features = [
       "nix-command"
       "flakes"
@@ -51,16 +59,17 @@
   users.users.recalune = {
     name = "recalune";
     home = "/Users/recalune";
+    shell = pkgs.zsh;
   };
 
   # environment.pathsToLink = [
   #   "/usr/share/zsh"
   # ];
 
-  security.pam.enableSudoTouchIdAuth = true;
+  security.pam.enableSudoTouchIdAuth = pkgs.stdenv.isDarwin;
 
   homebrew = {
-    enable = true;
+    enable = pkgs.stdenv.isDarwin;
     onActivation.upgrade = false;
     brews = [
       "pinentry-mac"
@@ -77,10 +86,20 @@
     ];
   };
 
+  fonts.fontDir.enable = true;
+  fonts.fonts = with pkgs; [
+    jetbrains-mono
+    nerdfonts
+  ];
+
   # `home-manager` config
   # home-manager.useGlobalPkgs = true;
   # home-manager.useUserPackages = true;
   # home-manager.users.recalune = import ./home.nix;
+
+  system.activationScripts.fixZshPermissions = pkgs.runCommand ''
+    compaudit | xargs sudo chown root:admin
+  '';
 
   # Used for backwards compatibility, please read the changelog before changing.
   # $ darwin-rebuild changelog

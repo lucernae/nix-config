@@ -42,10 +42,10 @@
     home = "/Users/maul";
   };
 
-  security.pam.enableSudoTouchIdAuth = true;
+  security.pam.enableSudoTouchIdAuth = pkgs.stdenv.isDarwin;
 
   homebrew = {
-    enable = true;
+    enable = pkgs.stdenv.isDarwin;
     onActivation.upgrade = false;
     brews = [
       "pinentry-mac"

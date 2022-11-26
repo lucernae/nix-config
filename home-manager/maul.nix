@@ -12,6 +12,7 @@
     ./programs/gpg.nix
     ./programs/zsh.nix
     ./programs/vscode.nix
+    ./programs/starship.nix
     ./services/gpg-agent.nix
   ];
 
