@@ -1,4 +1,5 @@
 { config, pkgs, ... }:
+with pkgs;
 {
     programs.git = {
       enable = true;
