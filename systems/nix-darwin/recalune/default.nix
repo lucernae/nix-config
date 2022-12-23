@@ -89,7 +89,7 @@
   fonts.fontDir.enable = true;
   fonts.fonts = with pkgs; [
     jetbrains-mono
-    nerdfonts
+    (nerdfonts.override { fonts = [ "FiraCode" "DroidSansMono" ]; })
   ];
 
   # `home-manager` config

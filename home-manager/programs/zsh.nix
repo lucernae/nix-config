@@ -46,7 +46,7 @@
       shellAliases = {
         hm = "home-manager";
         hms = "home-manager switch";
-        hmsf = "home-manager switch --flake ~/.config/nix-config/home-manager";
+        hmsf = "home-manager switch --flake ~/.config/nix-config/home-manager#$(whoami)";
         hmb = "home-manager build";
         drs = "darwin-rebuild switch";
         drsf = "darwin-rebuild switch --flake ~/.config/nix-config";
