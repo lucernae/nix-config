@@ -72,15 +72,24 @@
     enable = pkgs.stdenv.isDarwin;
     onActivation.upgrade = false;
     brews = [
-      "pinentry-mac"
+      # "pinentry-mac"
       "jq"
       "yq"
       "mas"
       "dagger"
     ];
+    masApps = {
+      Xcode = 497799835;
+      # We prefer to use Tailscale nix-darwin modules, so we comment this out
+      # Tailscale = 1475387142;
+      WhatsAppWeb = 1147396723;
+      SlackDesktop = 803453959;
+    };
     casks = [
       "fig"
       "cron"
+      "signal"
+      "discord"
       # "visual-studio-code" maintained by home-manager
       "docker"
     ];

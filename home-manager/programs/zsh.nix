@@ -13,6 +13,13 @@
         [[ -f "$HOME/.fig/shell/zshrc.pre.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.pre.zsh"
       '';
       initExtra = ''
+        # Set PATH, MANPATH, etc., for Homebrew.
+        eval "$(/opt/homebrew/bin/brew shellenv)" || eval "$(/usr/local/bin/brew shellenv)"
+
+        # Set PATH for Rancher Desktop
+        export PATH="$HOME/.rd/bin:$PATH"
+
+        # GPG
         export GPG_TTY=$(tty)
         gpgconf --launch gpg-agent
 

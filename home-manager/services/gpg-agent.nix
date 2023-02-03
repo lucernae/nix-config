@@ -6,7 +6,7 @@ with pkgs;
 {
     home.file."${homedir}/gpg-agent.conf".text = ''
     '' + (lib.strings.optionalString stdenv.isDarwin ''
-        pinentry-program /usr/local/bin/pinentry-mac
+        pinentry-program ${pinentry_mac}/Applications/pinentry-mac.app/Contents/MacOS/pinentry-mac
     '');
 
     services.gpg-agent.enable = stdenv.isLinux;

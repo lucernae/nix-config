@@ -7,7 +7,7 @@
     git
     vim
     gh
-  ];
+  ] ++ (lib.optionals stdenv.isDarwin [ pinentry_mac ]);
 
   # This value determines the Home Manager release that your
   # configuration is compatible with. This helps avoid breakage
