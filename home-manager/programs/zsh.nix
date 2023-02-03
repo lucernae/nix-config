@@ -30,6 +30,9 @@
         export GPG_TTY=$(tty)
         gpgconf --launch gpg-agent
 
+        # Sourcing custom scripts
+        source ~/.scripts/zsh/ssh.sh
+
         # Fig post block. Keep at the bottom of this file.
         [[ -f "$HOME/.fig/shell/zshrc.post.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.post.zsh"
       '';
@@ -65,6 +68,7 @@
         drs = "darwin-rebuild switch";
         drsf = "darwin-rebuild switch --flake ~/.config/nix-config";
         drb = "darwin-rebuild build";
+        sagent = "sshagent_init";
       } // (
         pkgs.lib.optionalAttrs pkgs.stdenv.isDarwin {
           # macos specific

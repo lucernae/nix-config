@@ -9,6 +9,13 @@
     gh
   ] ++ (lib.optionals stdenv.isDarwin [ pinentry_mac ]);
 
+  home.file.scripts = {
+    enable = true;
+    source = ./scripts;
+    target = "./.scripts";
+    recursive = false;
+  };
+
   # This value determines the Home Manager release that your
   # configuration is compatible with. This helps avoid breakage
   # when a new Home Manager release introduces backwards
