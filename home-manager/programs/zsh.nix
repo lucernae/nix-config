@@ -58,6 +58,13 @@
         drs = "darwin-rebuild switch";
         drsf = "darwin-rebuild switch --flake ~/.config/nix-config";
         drb = "darwin-rebuild build";
-      };
+      } // (
+        pkgs.lib.optionalAttrs pkgs.stdenv.isDarwin {
+          # macos specific
+          # macos screensharing enable
+          msse = "sudo defaults write /var/db/launchd.db/com.apple.launchd/overrides.plist com.apple.screensharing -dict Disabled -bool false && sudo launchctl load -w /System/Library/LaunchDaemons/com.apple.screensharing.plist";
+          mssd = "sudo defaults write /var/db/launchd.db/com.apple.launchd/overrides.plist com.apple.screensharing -dict Disabled -bool true && sudo launchctl unload -w /System/Library/LaunchDaemons/com.apple.screensharing.plist";
+        }
+      );
     };
 }
