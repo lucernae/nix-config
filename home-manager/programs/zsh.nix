@@ -14,7 +14,14 @@
       '';
       initExtra = ''
         # Set PATH, MANPATH, etc., for Homebrew.
-        eval "$(/opt/homebrew/bin/brew shellenv)" || eval "$(/usr/local/bin/brew shellenv)"
+        # Intel Mac uses this one
+        if [[ -f "/usr/local/bin/brew" ]]; then
+          eval "$(/usr/local/bin/brew shellenv)"
+        fi
+        # ARM Mac uses this one
+        if [[ -f "/opt/homebrew/bin/brew" ]]; then
+          eval "$(/opt/homebrew/bin/brew shellenv)"
+        fi
 
         # Set PATH for Rancher Desktop
         export PATH="$HOME/.rd/bin:$PATH"
