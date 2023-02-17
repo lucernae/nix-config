@@ -18,6 +18,7 @@
   outputs = { self, darwin, nixpkgs, flake-utils, home-manager,  ... }@inputs:
     let
       inherit (darwin.lib) darwinSystem;
+      inherit (nixpkgs.lib) nixosSystem;
       inherit (inputs.nixpkgs.lib) attrValues makeOverridable optionalAttrs singleton;
     in
     flake-utils.lib.eachSystem [
@@ -99,10 +100,35 @@
                   inputs = { inherit darwin; };
                 };
               };
+              nixosConfigurations = rec {
+                vmware-aarch64 = nixosSystem {
+                  inherit system;
+                  modules = attrValues self.nixosModules ++ [
+                    # vmware.guest module overrides
+                    ./modules/vmware-guest.nix
+                    # nixos config
+                    ./systems/nixos/vmware
+                    # home-manager
+                    home-manager.nixosModules.home-manager
+                    {
+                      nixpkgs = nixpkgsConfig;
+                      # `home-manager` config
+                      home-manager.useGlobalPkgs = true;
+                      home-manager.useUserPackages = true;
+                      home-manager.users.vmware = import ./home-manager/vmware.nix;
+                    }
+                    # tailscale
+                    ./services/tailscale
+                  ];
+                };
+              };
             };
 
           # extra darwinModules not yet available in upstreams
           darwinModules = { };
+
+          # extra nixosModules not yet available in upstreams
+          nixosModules = { };
         }
       );
 }
