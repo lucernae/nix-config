@@ -13,9 +13,11 @@
     # home manager
     home-manager.url = github:nix-community/home-manager;
     home-manager.inputs.nixpkgs.follows = "nixpkgs-unstable";
+    # devenv
+    devenv.url = "github:cachix/devenv/latest";
   };
 
-  outputs = { self, darwin, nixpkgs, flake-utils, home-manager,  ... }@inputs:
+  outputs = { self, darwin, nixpkgs, flake-utils, home-manager, devenv,  ... }@inputs:
     let
       inherit (darwin.lib) darwinSystem;
       inherit (nixpkgs.lib) nixosSystem;
@@ -24,6 +26,7 @@
     flake-utils.lib.eachSystem [
       flake-utils.lib.system.x86_64-darwin
       flake-utils.lib.system.aarch64-darwin
+      flake-utils.lib.system.aarch64-linux
     ]
       (
         system:
@@ -71,6 +74,11 @@
                       home-manager.useGlobalPkgs = true;
                       home-manager.useUserPackages = true;
                       home-manager.users.recalune = import ./home-manager/recalune.nix;
+
+                      # pass to home configuration
+                      home-manager.extraSpecialArgs = {
+                        inherit (devenv.packages.${system}) devenv;
+                      };
                     }
                     # tailscale
                     ./services/tailscale
@@ -104,8 +112,6 @@
                 vmware-aarch64 = nixosSystem {
                   inherit system;
                   modules = attrValues self.nixosModules ++ [
-                    # vmware.guest module overrides
-                    ./modules/vmware-guest.nix
                     # nixos config
                     ./systems/nixos/vmware
                     # home-manager
@@ -116,6 +122,11 @@
                       home-manager.useGlobalPkgs = true;
                       home-manager.useUserPackages = true;
                       home-manager.users.vmware = import ./home-manager/vmware.nix;
+                      
+                      # pass to home configuration
+                      home-manager.extraSpecialArgs = {
+                        inherit (devenv.packages.${system}) devenv;
+                      };
                     }
                     # tailscale
                     ./services/tailscale

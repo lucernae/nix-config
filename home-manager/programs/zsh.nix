@@ -2,6 +2,7 @@
 {
     programs.zsh = {
       enable = true;
+      dotDir = ".nix-zsh";
       completionInit = ''
         autoload -Uz compinit && compinit -i
       '';

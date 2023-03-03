@@ -16,4 +16,8 @@
     ./services/gpg-agent.nix
   ];
 
+  home.packages = with pkgs; [
+    obsidian
+  ];
+
 }

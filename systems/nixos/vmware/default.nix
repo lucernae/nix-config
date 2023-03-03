@@ -1,5 +1,10 @@
 { config, pkgs, home-manager, ... }:
 {
+  imports = [
+    # vmware.guest module overrides
+    ./modules/vmware-guests.nix
+  ]
+
   nix = {
     buildMachines = [
       {

@@ -70,20 +70,35 @@
 
   homebrew = {
     enable = pkgs.stdenv.isDarwin;
-    onActivation.upgrade = false;
+    onActivation = {
+      autoUpdate = false;
+      upgrade = false;
+      # use zap if you want nix-darwin solely manages homebrew packages
+      # cleanup = "zap";
+    };
+    taps = [
+      "homebrew/core"
+      "homebrew/cask"
+      "homebrew/cask-fonts"
+      "homebrew/cask-drivers"
+    ];
     brews = [
       # "pinentry-mac"
       "jq"
       "yq"
       "mas"
       "dagger"
+      "ykman"
+      "thefuck"
     ];
     masApps = {
       Xcode = 497799835;
       # We prefer to use Tailscale nix-darwin modules, so we comment this out
       # Tailscale = 1475387142;
+      Bitwarden = 1352778147;
       WhatsAppWeb = 1147396723;
       SlackDesktop = 803453959;
+      OneDrive = 823766827;
     };
     casks = [
       "fig"
@@ -92,6 +107,18 @@
       "discord"
       # "visual-studio-code" maintained by home-manager
       "docker"
+      "firefox"
+      "microsoft-edge"
+      "diffmerge"
+      "db-browser-for-sqlite"
+      "jetbrains-toolbox"
+      "github"
+      "google-drive"
+      "vmware-fusion"
+      "obs"
+      "rectangle"
+      "elgato-game-capture-hd"
+      "steam"
     ];
   };
 

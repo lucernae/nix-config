@@ -10,9 +10,11 @@
     };
     # Flake utils
     flake-utils.url = "github:numtide/flake-utils";
+    # devenv
+    devenv.url = "github:cachix/devenv/latest";
   };
 
-  outputs = {self, nixpkgs, home-manager, flake-utils, ...}:
+  outputs = {self, nixpkgs, home-manager, flake-utils, devenv, ...}:
     let
         inherit (flake-utils.lib) system eachSystem;
     in
@@ -29,6 +31,7 @@
                 };
             in
             rec {
+                formatter = nixpkgs.legacyPackages.${system}.nixpkgs-fmt;
             packages.homeConfigurations.recalune = home-manager.lib.homeManagerConfiguration {
                 inherit pkgs;
 
@@ -37,6 +40,10 @@
                 modules = [
                     ./recalune.nix
                 ];
+
+                extraSpecialArgs = {
+                inherit (devenv.packages.${system}) devenv;
+                };
             };
             packages.homeConfigurations.vscode = home-manager.lib.homeManagerConfiguration {
                 inherit pkgs;
@@ -46,6 +53,10 @@
                 modules = [
                 ./vscode.nix
                 ];
+
+                extraSpecialArgs = {
+                inherit (devenv.packages.${system}) devenv;
+                };
             };
         }
     );
