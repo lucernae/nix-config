@@ -11,6 +11,7 @@ with pkgs;
       };
       extraConfig = {
         core.editor = "vim";
+        core.fileMode = false;
         init.defaultBranch = "main";
         safe.directory = [ ] ++ (lib.optionals stdenv.isDarwin [
           "/usr/local/Homebrew"

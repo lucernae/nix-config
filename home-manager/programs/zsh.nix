@@ -69,6 +69,9 @@
         drs = "darwin-rebuild switch";
         drsf = "darwin-rebuild switch --flake ~/.config/nix-config";
         drb = "darwin-rebuild build";
+        nrs = "sudo nixos-rebuild switch";
+        nrsf = "sudo nixos-rebuild switch --flake ~/.config/nix-config";
+        nrb = "nixos-rebuild build";
         sagent = "sshagent_init";
       } // (
         pkgs.lib.optionalAttrs pkgs.stdenv.isDarwin {

@@ -32,7 +32,8 @@ in
     } ];
 
     boot.initrd.availableKernelModules = [ "mptspi" ];
-    boot.initrd.kernelModules = [ "vmw_pvscsi" ];
+    # disabled this kernel modules because nixos can't find it
+    # boot.initrd.kernelModules = [ "vmw_pvscsi" ];
 
     environment.systemPackages = [ open-vm-tools ];
 
@@ -68,7 +69,8 @@ in
     environment.etc.vmware-tools.source = "${open-vm-tools}/etc/vmware-tools/*";
 
     services.xserver = mkIf (!cfg.headless) {
-      modules = [ xf86inputvmmouse ];
+      # disabled because it was unable to be built
+      # modules = [ xf86inputvmmouse ];
 
       config = ''
           Section "InputClass"

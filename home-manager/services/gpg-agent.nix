@@ -7,8 +7,14 @@ with pkgs;
     home.file."${homedir}/gpg-agent.conf".text = ''
     '' + (lib.strings.optionalString stdenv.isDarwin ''
         pinentry-program ${pinentry_mac}/Applications/pinentry-mac.app/Contents/MacOS/pinentry-mac
+    '')
+    + (lib.strings.optionalString stdenv.isLinux ''
+        pinentry-program ${kwalletcli}/bin/kwalletcli
     '');
 
-    services.gpg-agent.enable = stdenv.isLinux;
-    services.gpg-agent.enableZshIntegration = true;
+    services.gpg-agent = {
+        enable = stdenv.isLinux;
+        enableZshIntegration = true;
+        pinentryFlavor = null;
+    }; 
 }

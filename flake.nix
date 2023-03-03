@@ -35,6 +35,7 @@
           nixpkgsConfig = {
             config = {
               allowUnfree = true;
+              allowUnsupportedSystem = true;
             };
             overlays = attrValues overlays ++ singleton (
               # For x86 packages that don't have aarch64 M1 support yet
@@ -109,9 +110,13 @@
                 };
               };
               nixosConfigurations = rec {
-                vmware-aarch64 = nixosSystem {
+                vmware = nixosSystem {
                   inherit system;
                   modules = attrValues self.nixosModules ++ [
+                    # hardware config
+                    ./hardware/vmware-aarch64.nix
+                    # vmware.guest module overrides
+                    ./modules/vmware-guests.nix
                     # nixos config
                     ./systems/nixos/vmware
                     # home-manager
@@ -128,8 +133,6 @@
                         inherit (devenv.packages.${system}) devenv;
                       };
                     }
-                    # tailscale
-                    ./services/tailscale
                   ];
                 };
               };
