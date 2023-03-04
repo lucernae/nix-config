@@ -63,7 +63,7 @@
   # home-manager.useGlobalPkgs = true;
   # home-manager.useUserPackages = true;
   # home-manager.users.recalune = import ./home.nix;
-  
+
   system.activationScripts.fixZshPermissions = pkgs.runCommand ''
     compaudit | xargs sudo chown root:admin
   '';
@@ -71,7 +71,7 @@
     pkill gpg-agent
   ''
 
-  # Used for backwards compatibility, please read the changelog before changing.
-  # $ darwin-rebuild changelog
-  system.stateVersion = 4;
+    # Used for backwards compatibility, please read the changelog before changing.
+    # $ darwin-rebuild changelog
+    system.stateVersion = 4;
 }

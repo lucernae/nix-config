@@ -12,7 +12,7 @@
     colima
     act
   ] ++ (lib.optionals stdenv.isDarwin [ pinentry_mac ])
-  ++ (lib.optionals stdenv.isLinux [ kgpg kwalletcli ] );
+  ++ (lib.optionals stdenv.isLinux [ kgpg kwalletcli ]);
 
   home.file.scripts = {
     enable = true;

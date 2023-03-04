@@ -16,7 +16,7 @@
 
   outputs = {self, nixpkgs, home-manager, flake-utils, devenv, ...}:
     let
-        inherit (flake-utils.lib) system eachSystem;
+      inherit (flake-utils.lib) system eachSystem;
     in
     eachSystem [
         system.x86_64-linux
@@ -59,5 +59,5 @@
                 };
             };
         }
-    );
+      );
 }
