@@ -90,6 +90,8 @@
       "dagger"
       "ykman"
       "thefuck"
+      "opencv"
+      "onnxruntime"
     ];
     masApps = {
       Xcode = 497799835;

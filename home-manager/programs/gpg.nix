@@ -2,7 +2,7 @@
 {
     programs.gpg = {
       enable = true;
-      package = pkgs.gnupg23;
+      package = pkgs.gnupg;
       settings = {
         use-agent = true;
       };

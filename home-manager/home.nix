@@ -7,6 +7,8 @@
     git
     vim
     gh
+    colima
+    act
   ] ++ (lib.optionals stdenv.isDarwin [ pinentry_mac ]);
 
   home.file.scripts = {
