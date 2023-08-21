@@ -8,13 +8,14 @@ with pkgs;
     '' + (lib.strings.optionalString stdenv.isDarwin ''
     pinentry-program ${pinentry_mac}/Applications/pinentry-mac.app/Contents/MacOS/pinentry-mac
   '')
-  + (lib.strings.optionalString stdenv.isLinux ''
-    pinentry-program ${kwalletcli}/bin/kwalletcli
-  '');
+  # + (lib.strings.optionalString stdenv.isLinux ''
+  #   pinentry-program ${kwalletcli}/bin/kwalletcli
+  # '')
+  ;
 
   services.gpg-agent = {
-    enable = stdenv.isLinux;
+    enable = true;
     enableZshIntegration = true;
-    pinentryFlavor = null;
+    pinentryFlavor = "qt";
   };
 }

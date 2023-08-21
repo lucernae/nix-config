@@ -17,7 +17,7 @@
     devenv.url = "github:cachix/devenv/latest";
   };
 
-  outputs = { self, darwin, nixpkgs, flake-utils, home-manager, devenv,  ... }@inputs:
+  outputs = { self, darwin, nixpkgs, flake-utils, home-manager, devenv, ... }@inputs:
     let
       inherit (darwin.lib) darwinSystem;
       inherit (nixpkgs.lib) nixosSystem;
@@ -127,7 +127,7 @@
                       home-manager.useGlobalPkgs = true;
                       home-manager.useUserPackages = true;
                       home-manager.users.vmware = import ./home-manager/vmware.nix;
-                      
+
                       # pass to home configuration
                       home-manager.extraSpecialArgs = {
                         inherit (devenv.packages.${system}) devenv;

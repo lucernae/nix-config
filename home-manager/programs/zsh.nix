@@ -1,19 +1,19 @@
 { config, pkgs, ... }:
 {
-    programs.zsh = {
-      enable = true;
-      dotDir = ".nix-zsh";
-      completionInit = ''
-        autoload -Uz compinit && compinit -i
-      '';
-      initExtraBeforeCompInit = ''
-        ZSH_DISABLE_COMPFIX=true
-      '';
-      initExtraFirst = ''
-        # Fig pre block. Keep at the top of this file.
-        [[ -f "$HOME/.fig/shell/zshrc.pre.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.pre.zsh"
-      '';
-      initExtra = ''
+  programs.zsh = {
+    enable = true;
+    dotDir = ".nix-zsh";
+    completionInit = ''
+      autoload -Uz compinit && compinit -i
+    '';
+    initExtraBeforeCompInit = ''
+      ZSH_DISABLE_COMPFIX=true
+    '';
+    initExtraFirst = ''
+      # Fig pre block. Keep at the top of this file.
+      [[ -f "$HOME/.fig/shell/zshrc.pre.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.pre.zsh"
+    '';
+    initExtra = ''
         # Set PATH, MANPATH, etc., for Homebrew.
         # Intel Mac uses this one
         if [[ -f "/usr/local/bin/brew" ]]; then

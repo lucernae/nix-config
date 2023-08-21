@@ -6,12 +6,14 @@
     oh-my-zsh
     git
     # vim # declared as programs.vim
-    bitwarden
-    bitwarden-cli
     gh
     colima
     act
-  ] ++ (lib.optionals stdenv.isDarwin [ pinentry_mac ])
+  ] ++ (lib.optionals stdenv.isDarwin [
+    pinentry_mac
+    bitwarden
+    bitwarden-cli
+  ])
   ++ (lib.optionals stdenv.isLinux [ kgpg kwalletcli ]);
 
   home.file.scripts = {

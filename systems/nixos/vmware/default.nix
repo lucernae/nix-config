@@ -1,9 +1,6 @@
 { config, pkgs, home-manager, ... }:
 {
-  imports = [
-    # vmware.guest module overrides
-    ./modules/vmware-guests.nix
-  ]
+  imports = [ ];
 
   nix = {
     buildMachines = [
@@ -31,8 +28,7 @@
       "flakes"
     ];
     settings.extra-platforms = [
-      "x86_64-darwin"
-      "aarch64-darwin"
+      "x86_64-linux"
     ];
     # package = nixpkgs-unstable.nix;
   };
@@ -48,7 +44,7 @@
 
   boot.binfmt.emulatedSystems = [ "x86_64-linux" ];
 
-  hardware.video.hidpi.enable = true;
+  # hardware.video.hidpi.enable = true;
 
   # Share our host filesystem
   # See: https://kb.vmware.com/s/article/60262
@@ -60,8 +56,6 @@
       "uid=${builtins.toString config.users.users.vmware.uid}"
       "gid=${builtins.toString config.users.groups.vmware.gid}"
       "allow_other"
-      "auto_unmount"
-      "defaults"
     ];
   };
 
@@ -163,6 +157,7 @@
     pciutils
     tailscale
     open-vm-tools
+    libsForQt5.filelight
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -172,6 +167,9 @@
     enable = true;
     enableSSHSupport = true;
   };
+
+  programs.zsh.enable = true;
+  programs.partition-manager.enable = true;
 
 
   # programs.vim = {
