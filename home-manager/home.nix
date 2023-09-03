@@ -1,6 +1,7 @@
 { config, pkgs, ... }:
 {
   home.packages = with pkgs; [
+    iconv
     htop
     zsh
     oh-my-zsh

@@ -1,0 +1,5 @@
+{
+    "useFlake": "true",
+    "prebuildHomeManagerFlake": "./home-manager#vscode",
+    "imageVariant": "flake---latest"
+}
