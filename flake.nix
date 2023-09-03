@@ -24,6 +24,7 @@
       inherit (inputs.nixpkgs.lib) attrValues makeOverridable optionalAttrs singleton;
     in
     flake-utils.lib.eachSystem [
+      flake-utils.lib.system.x86_64-linux
       flake-utils.lib.system.x86_64-darwin
       flake-utils.lib.system.aarch64-darwin
       flake-utils.lib.system.aarch64-linux
@@ -64,6 +65,9 @@
                 recalune = darwinSystem {
                   inherit system;
                   modules = attrValues self.darwinModules ++ [
+                    # modules
+                    # ./services/nix-serve
+
                     # nix-darwin configuration
                     ./systems/nix-darwin/recalune
                     # home-manager
@@ -81,7 +85,7 @@
                       };
                     }
                     # tailscale
-                    ./services/tailscale
+                    # ./services/tailscale
                   ];
                   # inputs = { inherit darwin nixpkgs; };
                   inputs = { inherit darwin; };
@@ -136,7 +140,9 @@
             };
 
           # extra darwinModules not yet available in upstreams
-          darwinModules = { };
+          darwinModules = {
+            # nix-serve = 
+          };
 
           # extra nixosModules not yet available in upstreams
           nixosModules = { };

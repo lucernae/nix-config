@@ -49,7 +49,24 @@
 
   # Auto upgrade nix package and the daemon service.
   services.nix-daemon.enable = true;
-  services.tailscale.enable = true;
+  launchd.daemons.nix-serve = {
+    serviceConfig = {
+      Label = "org.nixos.nix-serve";
+      # Note that currently we are using x86_64-darwin because no aarch64-darwin system available
+      ProgramArguments = [
+        "/bin/sh"
+        "-c"
+        "NIX_SECRET_KEY_FILE=/Users/recalune/.ssh/cache-priv-key.pem /run/current-system/sw/bin/nix run github:edolstra/nix-serve#defaultPackage.x86_64-darwin -- --listen :5700"
+      ];
+      StandardErrorPath = "/tmp/nix-serve.err";
+      StandardOutPath = "/tmp/nix-serve.out";
+      RunAtLoad = true;
+      KeepAlive = {
+        SuccessfulExit = false;
+      };
+    };
+  };
+  # services.tailscale.enable = true;
   # nix.package = pkgs.nix;
 
   # Create /etc/zshrc that loads the nix-darwin environment.
@@ -96,7 +113,7 @@
     masApps = {
       Xcode = 497799835;
       # We prefer to use Tailscale nix-darwin modules, so we comment this out
-      # Tailscale = 1475387142;
+      Tailscale = 1475387142;
       Bitwarden = 1352778147;
       WhatsAppWeb = 1147396723;
       SlackDesktop = 803453959;
