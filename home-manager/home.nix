@@ -9,6 +9,7 @@
     vim
     gh
     colima
+    nixd
     act
   ] ++ (lib.optionals stdenv.isDarwin [ pinentry_mac ]);
 

@@ -40,7 +40,7 @@
       # pkgs.zsh
       # pkgs.bash
       pkgs.home-manager
-      pkgs.tailscale
+      # pkgs.tailscale
     ];
 
   # Use a custom configuration.nix location.
@@ -94,6 +94,7 @@
       # cleanup = "zap";
     };
     taps = [
+      "homebrew/bundle"
       "homebrew/core"
       "homebrew/cask"
       "homebrew/cask-fonts"

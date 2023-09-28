@@ -15,9 +15,49 @@
     home-manager.inputs.nixpkgs.follows = "nixpkgs-unstable";
     # devenv
     devenv.url = "github:cachix/devenv/latest";
+    # VS Code Nix Community
+    nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
+    # nix-homebrew
+    nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
+    # nix-homebrew tap
+    homebrew-core = {
+      url = "github:homebrew/homebrew-core";
+      flake = false;
+    };
+    homebrew-bundle = {
+      url = "github:homebrew/homebrew-bundle";
+      flake = false;
+    };
+    homebrew-cask = {
+      url = "github:homebrew/homebrew-cask";
+      flake = false;
+    };
+    homebrew-cask-drivers = {
+      url = "github:homebrew/homebrew-cask-drivers";
+      flake = false;
+    };
+    homebrew-cask-fonts = {
+      url = "github:homebrew/homebrew-cask-fonts";
+      flake = false;
+    };
+    homebrew-apple = {
+      url = "github:apple/homebrew-apple";
+      flake = false;
+    };
   };
 
-  outputs = { self, darwin, nixpkgs, flake-utils, home-manager, devenv,  ... }@inputs:
+  outputs = { self, darwin, nixpkgs, flake-utils, 
+  home-manager, 
+  devenv, 
+  nix-vscode-extensions, 
+  nix-homebrew,
+  homebrew-core,
+  homebrew-bundle,
+  homebrew-cask,
+  homebrew-cask-drivers,
+  homebrew-cask-fonts,
+  homebrew-apple,
+  ... }@inputs:
     let
       inherit (darwin.lib) darwinSystem;
       inherit (nixpkgs.lib) nixosSystem;
@@ -37,13 +77,18 @@
             config = {
               allowUnfree = true;
             };
-            overlays = attrValues overlays ++ singleton (
-              # For x86 packages that don't have aarch64 M1 support yet
-              final: prev: (optionalAttrs (system == flake-utils.lib.system.aarch64-darwin) {
-                #   inherit (final.pkgs-x86)
-                #     vim
+            overlays = attrValues overlays ++ [
+              (
+                # For x86 packages that don't have aarch64 M1 support yet
+                final: prev: (optionalAttrs (system == flake-utils.lib.system.aarch64-darwin) {
+                  #   inherit (final.pkgs-x86)
+                  #     vim
+                })
+              )
+              (final: prev: {
+                nix-vscode-extensions = nix-vscode-extensions.extensions.${system};
               })
-            );
+            ];
           };
 
           # overlays config
@@ -67,6 +112,32 @@
                   modules = attrValues self.darwinModules ++ [
                     # modules
                     # ./services/nix-serve
+                    nix-homebrew.darwinModules.nix-homebrew
+                    {
+                      nix-homebrew = {
+                        # Install Homebrew under the default prefix
+                        enable = true;
+
+                        # Apple Silicon Only: Also install Homebrew under the default Intel prefix for Rosetta 2
+                        enableRosetta = true;
+
+                        # User owning the Homebrew prefix
+                        user = "recalune";
+
+                        # taps
+                        taps = {
+                          "homebrew/homebrew-core" = homebrew-core;
+                          "homebrew/homebrew-bundle" = homebrew-bundle;
+                          "homebrew/homebrew-cask" = homebrew-cask;
+                          "homebrew/homebrew-cask-drivers" = homebrew-cask-drivers;
+                          "homebrew/homebrew-cask-fonts" = homebrew-cask-fonts;
+                          "apple/apple" = homebrew-apple;
+                        };
+
+                        # Automatically migrate existing Homebrew installations
+                        autoMigrate = true;
+                      };
+                    }
 
                     # nix-darwin configuration
                     ./systems/nix-darwin/recalune
@@ -126,7 +197,7 @@
                       home-manager.useGlobalPkgs = true;
                       home-manager.useUserPackages = true;
                       home-manager.users.vmware = import ./home-manager/vmware.nix;
-                      
+
                       # pass to home configuration
                       home-manager.extraSpecialArgs = {
                         inherit (devenv.packages.${system}) devenv;
