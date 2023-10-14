@@ -28,6 +28,8 @@ with pkgs;
         redhat.vscode-yaml
         tailscale.vscode-tailscale
         unifiedjs.vscode-mdx
+        graphql.vscode-graphql
+        graphql.vscode-graphql-syntax
       ]
       # ++ (lib.optionals stdenv.isDarwin [ withfig.fig ])
     ;

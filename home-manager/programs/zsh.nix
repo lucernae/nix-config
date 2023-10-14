@@ -17,13 +17,13 @@
       # Set PATH, MANPATH, etc., for Homebrew.
       # Doesn't need it now since we are using nix-homebrew
       # Intel Mac uses this one
-      # if [[ -f "/usr/local/bin/brew" ]]; then
-      #   eval "$(/usr/local/bin/brew shellenv)"
-      # fi
-      # # ARM Mac uses this one
-      # if [[ -f "/opt/homebrew/bin/brew" ]]; then
-      #   eval "$(/opt/homebrew/bin/brew shellenv)"
-      # fi
+      if [[ "$(arch)" == "i386" ]]; then
+        eval "$(/usr/local/bin/brew shellenv)"
+      fi
+      # ARM Mac uses this one
+      if [[ "$(arch)" == "arm64" ]]; then
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+      fi
 
       # Set PATH for Rancher Desktop
       export PATH="$HOME/.rd/bin:$PATH"

@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 {
   home.packages = with pkgs; [
     iconv
@@ -19,6 +19,23 @@
     target = "./.scripts";
     recursive = false;
   };
+
+  # NodeJS global settings
+  home.sessionPath = [
+    "$HOME/.npm-global"
+  ];
+
+  home.file.".npmrc" = {
+    enable = true;
+    text = ''
+    prefix=$HOME/.npm-global
+    '';
+    target = ".npmrc";
+  };
+
+  home.activation.node-npm-global = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    $DRY_RUN_CMD mkdir -p $HOME/.npm-global $HOME/.npm-global/lib $HOME/.npm-global/bin
+  '';
 
   # This value determines the Home Manager release that your
   # configuration is compatible with. This helps avoid breakage

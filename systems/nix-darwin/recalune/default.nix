@@ -110,6 +110,7 @@
       "thefuck"
       "opencv"
       "onnxruntime"
+      "fswatch"
     ];
     masApps = {
       Xcode = 497799835;
