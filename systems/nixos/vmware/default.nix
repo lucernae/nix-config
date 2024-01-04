@@ -58,7 +58,7 @@
       pkgs.open-vm-tools
       pkgs.xdg-utils
     ];
-    
+
   # nix.package = pkgs.nix;
 
   programs.zsh.enable = true; # default shell on catalina

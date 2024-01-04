@@ -7,13 +7,17 @@
 # Stolen from https://github.com/HanStolpo/nixos-config-public/blob/master/overlays/realvnc-viewer/realvnc-viewer.nix
 stdenv.mkDerivation {
   name = "realvnc-viewer";
-  src = if stdenv.isAarch64 then fetchurl {
-    url = "https://downloads.realvnc.com/download/file/viewer.files/VNC-Viewer-7.8.0-Linux-ARM64";
-    sha256 = "sha256-IHcJ57N0EcwjV2cxK208511T+FWWUCYeoyX9XURB6hk=";
-  } else stdenv.x86 {
-    url = "https://downloads.realvnc.com/download/file/viewer.files/VNC-Viewer-7.8.0-Linux-x64";
-    sha256 = "sha256-mFWdM6kYO0LZxF0vsEn4LRBj2hgzgvUqiWDEzMfwBzE=";
-  };
+  src =
+    if stdenv.isAarch64 then
+      fetchurl
+        {
+          url = "https://downloads.realvnc.com/download/file/viewer.files/VNC-Viewer-7.8.0-Linux-ARM64";
+          sha256 = "sha256-IHcJ57N0EcwjV2cxK208511T+FWWUCYeoyX9XURB6hk=";
+        } else
+      stdenv.x86 {
+        url = "https://downloads.realvnc.com/download/file/viewer.files/VNC-Viewer-7.8.0-Linux-x64";
+        sha256 = "sha256-mFWdM6kYO0LZxF0vsEn4LRBj2hgzgvUqiWDEzMfwBzE=";
+      };
   dontUnpack = true;
   buildInputs = [ xorg.libX11 xorg.libXext xorg.libSM xorg.libICE patchelf makeWrapper ];
   buildPhase = ''
