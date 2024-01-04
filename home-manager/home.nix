@@ -11,7 +11,18 @@
     colima
     nixd
     act
-  ] ++ (lib.optionals stdenv.isDarwin [ pinentry_mac ]);
+    comma
+  ] ++ [
+    # programming languages related
+    go
+    wasmtime
+    python3
+    python3Packages.pip
+    python3Packages.virtualenv
+    cmake
+    yarn
+    poetry
+  ];
 
   home.file.scripts = {
     enable = true;
@@ -28,12 +39,12 @@
   home.file.".npmrc" = {
     enable = true;
     text = ''
-    prefix=$HOME/.npm-global
+      prefix=$HOME/.npm-global
     '';
     target = ".npmrc";
   };
 
-  home.activation.node-npm-global = lib.hm.dag.entryAfter ["writeBoundary"] ''
+  home.activation.node-npm-global = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     $DRY_RUN_CMD mkdir -p $HOME/.npm-global $HOME/.npm-global/lib $HOME/.npm-global/bin
   '';
 

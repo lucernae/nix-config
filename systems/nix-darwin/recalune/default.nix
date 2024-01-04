@@ -15,7 +15,7 @@
         speedFactor = 2;
       }
     ];
-    distributedBuilds = true;
+    distributedBuilds = false;
     settings.trusted-users = [
       "@admin"
       "@wheel"
@@ -41,6 +41,7 @@
       # pkgs.bash
       pkgs.home-manager
       # pkgs.tailscale
+      # pkgs.pinentry_mac
     ];
 
   # Use a custom configuration.nix location.
@@ -101,7 +102,7 @@
       "homebrew/cask-drivers"
     ];
     brews = [
-      # "pinentry-mac"
+      "pinentry-mac"
       "jq"
       "yq"
       "mas"
@@ -113,13 +114,17 @@
       "fswatch"
     ];
     masApps = {
+      # App URL format
+      # https://apps.apple.com/id/app/line/id539883307?mt=12
       Xcode = 497799835;
       # We prefer to use Tailscale nix-darwin modules, so we comment this out
       Tailscale = 1475387142;
       Bitwarden = 1352778147;
-      WhatsAppWeb = 1147396723;
+      # WhatsAppWeb = 1147396723;
+      WhatsAppMessenger = 310633997;
       SlackDesktop = 803453959;
       OneDrive = 823766827;
+      Line = 539883307;
     };
     casks = [
       "fig"

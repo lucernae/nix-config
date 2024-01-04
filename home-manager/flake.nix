@@ -67,6 +67,19 @@
               inherit (devenv.packages.${system}) devenv;
             };
           };
+          packages.homeConfigurations.vmware = home-manager.lib.homeManagerConfiguration {
+            inherit pkgs;
+
+            # Specify your home configuration modules here, for example,
+            # the path to your home.nix.
+            modules = [
+              ./vmware.nix
+            ];
+
+            extraSpecialArgs = {
+              inherit (devenv.packages.${system}) devenv;
+            };
+          };
         }
       );
 }

@@ -17,11 +17,11 @@
       # Set PATH, MANPATH, etc., for Homebrew.
       # Doesn't need it now since we are using nix-homebrew
       # Intel Mac uses this one
-      if [[ "$(arch)" == "i386" ]]; then
+      if [[ "$(uname)" == "Darwin" && "$(arch)" == "i386" ]]; then
         eval "$(/usr/local/bin/brew shellenv)"
       fi
       # ARM Mac uses this one
-      if [[ "$(arch)" == "arm64" ]]; then
+      if [[ "$(uname)" == "Darwin" && "$(arch)" == "arm64" ]]; then
         eval "$(/opt/homebrew/bin/brew shellenv)"
       fi
 
@@ -71,6 +71,17 @@
       drsf = "darwin-rebuild switch --flake ~/.config/nix-config";
       drb = "darwin-rebuild build";
       sagent = "sshagent_init";
+      gca = "git commit -a -m";
+      gcammend = "git commit -a --amend --no-edit";
+      gpo = "git pull origin --rebase";
+      gpu = "git push origin -u";
+      gsc = "git switch main -c";
+      gco = "git checkout";
+      gs = "git status";
+      gl = "git log";
+      gls = "git log --show-signature";
+      grs = "git reset --soft";
+      grh = "git reset --hard";
     } // (
       pkgs.lib.optionalAttrs pkgs.stdenv.isDarwin {
         # macos specific

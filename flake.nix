@@ -46,18 +46,23 @@
     };
   };
 
-  outputs = { self, darwin, nixpkgs, flake-utils, 
-  home-manager, 
-  devenv, 
-  nix-vscode-extensions, 
-  nix-homebrew,
-  homebrew-core,
-  homebrew-bundle,
-  homebrew-cask,
-  homebrew-cask-drivers,
-  homebrew-cask-fonts,
-  homebrew-apple,
-  ... }@inputs:
+  outputs =
+    { self
+    , darwin
+    , nixpkgs
+    , flake-utils
+    , home-manager
+    , devenv
+    , nix-vscode-extensions
+    , nix-homebrew
+    , homebrew-core
+    , homebrew-bundle
+    , homebrew-cask
+    , homebrew-cask-drivers
+    , homebrew-cask-fonts
+    , homebrew-apple
+    , ...
+    }@inputs:
     let
       inherit (darwin.lib) darwinSystem;
       inherit (nixpkgs.lib) nixosSystem;
@@ -131,7 +136,7 @@
                           "homebrew/homebrew-cask" = homebrew-cask;
                           "homebrew/homebrew-cask-drivers" = homebrew-cask-drivers;
                           "homebrew/homebrew-cask-fonts" = homebrew-cask-fonts;
-                          "apple/apple" = homebrew-apple;
+                          "apple/homebrew-apple" = homebrew-apple;
                         };
 
                         # Automatically migrate existing Homebrew installations
@@ -184,11 +189,15 @@
                 };
               };
               nixosConfigurations = rec {
-                vmware-aarch64 = nixosSystem {
+                vmware = nixosSystem {
                   inherit system;
                   modules = attrValues self.nixosModules ++ [
+                    # custom modules
+                    ./modules/vmware-guests.nix
+                    ./modules/real-vnc-viewer
                     # nixos config
-                    ./systems/nixos/vmware
+                    ./systems/nixos/vmware/default.nix
+                    ./systems/nixos/vmware/configuration.nix
                     # home-manager
                     home-manager.nixosModules.home-manager
                     {
@@ -204,7 +213,7 @@
                       };
                     }
                     # tailscale
-                    ./services/tailscale
+                    # ./services/tailscale
                   ];
                 };
               };
