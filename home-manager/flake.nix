@@ -14,9 +14,20 @@
     devenv.url = "github:cachix/devenv/latest";
     # VS Code Nix Community
     nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
+    # Pinentry-Box
+    pinentry-box.url = "github:lucernae/pinentry-box?dir=pinentry-box";
   };
 
-  outputs = { self, nixpkgs, home-manager, flake-utils, devenv, nix-vscode-extensions, ... }:
+  outputs =
+    { self
+    , nixpkgs
+    , home-manager
+    , flake-utils
+    , devenv
+    , nix-vscode-extensions
+    , pinentry-box
+    , ...
+    }:
     let
       inherit (flake-utils.lib) system eachSystem;
     in
@@ -35,6 +46,7 @@
             overlays = [
               (final: prev: {
                 nix-vscode-extensions = nix-vscode-extensions.extensions.${system};
+                pinentry-box = pinentry-box.packages.${system}.pinentry_box;
               })
             ];
           };
