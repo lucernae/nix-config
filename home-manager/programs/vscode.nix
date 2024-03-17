@@ -17,7 +17,7 @@ with pkgs;
         golang.go
         ms-azuretools.vscode-docker
         ms-kubernetes-tools.vscode-kubernetes-tools
-        ms-vscode.makefile-tools
+        # ms-vscode.makefile-tools
         ms-vscode.remote-server
         ms-vscode-remote.remote-containers
         ms-vscode-remote.remote-ssh
@@ -30,6 +30,7 @@ with pkgs;
         unifiedjs.vscode-mdx
         graphql.vscode-graphql
         graphql.vscode-graphql-syntax
+        leanprover.lean4
       ]
       # ++ (lib.optionals stdenv.isDarwin [ withfig.fig ])
     ;

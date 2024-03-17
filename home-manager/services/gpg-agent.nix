@@ -18,7 +18,7 @@ with pkgs;
   (lib.strings.optionalString stdenv.isDarwin ''
     pinentry-program ${pkgs.pinentry-box}/bin/pinentry-box
   '');
-  
+
 
   services.gpg-agent.enable = stdenv.isLinux;
   services.gpg-agent.enableZshIntegration = true;

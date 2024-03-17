@@ -47,6 +47,7 @@
               (final: prev: {
                 nix-vscode-extensions = nix-vscode-extensions.extensions.${system};
                 pinentry-box = pinentry-box.packages.${system}.pinentry_box;
+                pinentry-box-cli = pinentry-box.packages.${system}.pinentry_box_cli;
               })
             ];
           };

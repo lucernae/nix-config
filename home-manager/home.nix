@@ -12,6 +12,9 @@
     nixd
     act
     comma
+    bitwarden-cli
+    bws
+    elan
   ] ++ [
     # programming languages related
     go
@@ -22,7 +25,11 @@
     cmake
     yarn
     poetry
-  ];
+  ] ++ (
+    lib.optionals stdenv.isDarwin [
+      pinentry-box-cli
+    ]
+  );
 
   home.file.scripts = {
     enable = true;
