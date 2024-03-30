@@ -216,6 +216,14 @@
                     # ./services/tailscale
                   ];
                 };
+
+                raspberry-pi_3 = nixosSystem {
+                  system = "aarch64-linux";
+                  modules = attrValues self.nixosModules ++ [
+                    "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
+                    ./systems/nixos/raspi/configuration.nix
+                  ];
+                };
               };
             };
 
