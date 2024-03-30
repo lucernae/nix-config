@@ -217,10 +217,11 @@
                   ];
                 };
 
+                # to build: nix build github:lucernae/nix-config#nixosConfigurations.raspberry-pi_3.config.system.build.sdImage
                 raspberry-pi_3 = nixosSystem {
                   system = "aarch64-linux";
                   modules = attrValues self.nixosModules ++ [
-                    "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
+                    "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64-installer.nix"
                     ./systems/nixos/raspi/configuration.nix
                   ];
                 };
