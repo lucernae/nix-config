@@ -11,10 +11,10 @@ let
 in
 {
   imports = [
-    (mkRenamedOptionModule [ "services" "vmwareGuest" ] [ "virtualisation" "vmware" "guest" ])
+    (mkRenamedOptionModule [ "services" "vmwareGuestCustom" ] [ "virtualisation" "vmware" "guestCustom" ])
   ];
 
-  options.virtualisation.vmware.guest = {
+  options.virtualisation.vmware.guestCustom = {
     enable = mkEnableOption (lib.mdDoc "VMWare Guest Support");
     headless = mkOption {
       type = types.bool;

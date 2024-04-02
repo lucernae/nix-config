@@ -1,6 +1,7 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 {
   home.packages = with pkgs; [
+    iconv
     htop
     zsh
     oh-my-zsh
@@ -8,12 +9,27 @@
     # vim # declared as programs.vim
     gh
     colima
+    nixd
     act
-  ] ++ (lib.optionals stdenv.isDarwin [
-    pinentry_mac
-    bitwarden
+    comma
     bitwarden-cli
-  ])
+    bws
+    elan
+  ] ++ [
+    # programming languages related
+    go
+    wasmtime
+    python3
+    python3Packages.pip
+    python3Packages.virtualenv
+    cmake
+    yarn
+    poetry
+  ] ++ (
+    lib.optionals stdenv.isDarwin [
+      pinentry-box-cli
+    ]
+  )
   ++ (lib.optionals stdenv.isLinux [ kgpg kwalletcli ]);
 
   home.file.scripts = {
@@ -22,6 +38,23 @@
     target = "./.scripts";
     recursive = false;
   };
+
+  # NodeJS global settings
+  home.sessionPath = [
+    "$HOME/.npm-global"
+  ];
+
+  home.file.".npmrc" = {
+    enable = true;
+    text = ''
+      prefix=$HOME/.npm-global
+    '';
+    target = ".npmrc";
+  };
+
+  home.activation.node-npm-global = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    $DRY_RUN_CMD mkdir -p $HOME/.npm-global $HOME/.npm-global/lib $HOME/.npm-global/bin
+  '';
 
   # This value determines the Home Manager release that your
   # configuration is compatible with. This helps avoid breakage

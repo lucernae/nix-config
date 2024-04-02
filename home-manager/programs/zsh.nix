@@ -14,15 +14,16 @@
       [[ -f "$HOME/.fig/shell/zshrc.pre.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.pre.zsh"
     '';
     initExtra = ''
-        # Set PATH, MANPATH, etc., for Homebrew.
-        # Intel Mac uses this one
-        if [[ -f "/usr/local/bin/brew" ]]; then
-          eval "$(/usr/local/bin/brew shellenv)"
-        fi
-        # ARM Mac uses this one
-        if [[ -f "/opt/homebrew/bin/brew" ]]; then
-          eval "$(/opt/homebrew/bin/brew shellenv)"
-        fi
+      # Set PATH, MANPATH, etc., for Homebrew.
+      # Doesn't need it now since we are using nix-homebrew
+      # Intel Mac uses this one
+      if [[ "$(uname)" == "Darwin" && "$(arch)" == "i386" ]]; then
+        eval "$(/usr/local/bin/brew shellenv)"
+      fi
+      # ARM Mac uses this one
+      if [[ "$(uname)" == "Darwin" && "$(arch)" == "arm64" ]]; then
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+      fi
 
       # Set PATH for Rancher Desktop
       export PATH="$HOME/.rd/bin:$PATH"
@@ -73,12 +74,24 @@
       nrsf = "sudo nixos-rebuild switch --flake ~/.config/nix-config";
       nrb = "nixos-rebuild build";
       sagent = "sshagent_init";
+      gca = "git commit -a -m";
+      gcammend = "git commit -a --amend --no-edit";
+      gpo = "git pull origin --rebase";
+      gpu = "git push origin -u";
+      gsc = "git switch main -c";
+      gco = "git checkout";
+      gs = "git status";
+      gl = "git log";
+      gls = "git log --show-signature";
+      grs = "git reset --soft";
+      grh = "git reset --hard";
     } // (
       pkgs.lib.optionalAttrs pkgs.stdenv.isDarwin {
         # macos specific
         # macos screensharing enable
         msse = "sudo defaults write /var/db/launchd.db/com.apple.launchd/overrides.plist com.apple.screensharing -dict Disabled -bool false && sudo launchctl load -w /System/Library/LaunchDaemons/com.apple.screensharing.plist";
         mssd = "sudo defaults write /var/db/launchd.db/com.apple.launchd/overrides.plist com.apple.screensharing -dict Disabled -bool true && sudo launchctl unload -w /System/Library/LaunchDaemons/com.apple.screensharing.plist";
+        tailscale = "/Applications/Tailscale.app/Contents/MacOS/Tailscale";
       }
     );
   };
