@@ -17,6 +17,8 @@
     devenv.url = "github:cachix/devenv/latest";
     # VS Code Nix Community
     nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
+    # Pinentry-Box
+    pinentry-box.url = "github:lucernae/pinentry-box?dir=pinentry-box";
     # nix-homebrew
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
     # nix-homebrew tap
@@ -44,6 +46,10 @@
       url = "github:apple/homebrew-apple";
       flake = false;
     };
+    homebrew-lizardbyte = {
+      url = "github:LizardByte/homebrew-homebrew";
+      flake = false;
+    };
   };
 
   outputs =
@@ -54,6 +60,7 @@
     , home-manager
     , devenv
     , nix-vscode-extensions
+    , pinentry-box
     , nix-homebrew
     , homebrew-core
     , homebrew-bundle
@@ -61,6 +68,7 @@
     , homebrew-cask-drivers
     , homebrew-cask-fonts
     , homebrew-apple
+    , homebrew-lizardbyte
     , ...
     }@inputs:
     let
@@ -92,6 +100,8 @@
               )
               (final: prev: {
                 nix-vscode-extensions = nix-vscode-extensions.extensions.${system};
+                pinentry-box = pinentry-box.packages.${system}.pinentry_box;
+                pinentry-box-cli = pinentry-box.packages.${system}.pinentry_box_cli;
               })
             ];
           };
@@ -137,6 +147,7 @@
                           "homebrew/homebrew-cask-drivers" = homebrew-cask-drivers;
                           "homebrew/homebrew-cask-fonts" = homebrew-cask-fonts;
                           "apple/homebrew-apple" = homebrew-apple;
+                          "LizardByte/homebrew-homebrew" = homebrew-lizardbyte;
                         };
 
                         # Automatically migrate existing Homebrew installations

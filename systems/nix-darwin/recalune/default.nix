@@ -112,6 +112,8 @@
       "opencv"
       "onnxruntime"
       "fswatch"
+      # sunshine is still experimental in macos
+      # "sunshine"
     ];
     masApps = {
       # App URL format
