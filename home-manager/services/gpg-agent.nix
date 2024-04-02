@@ -22,6 +22,6 @@ with pkgs;
   services.gpg-agent = {
     enable = stdenv.isLinux;
     enableZshIntegration = true;
-    pinentryFlavor = "qt";
+    pinentryPackage = pkgs.pinentry-qt;
   };
 }

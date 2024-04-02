@@ -6,6 +6,20 @@ with pkgs;
   programs.vscode = {
     enable = true;
     enableUpdateCheck = true;
+    userSettings = {
+      "editor.stickyScroll.enabled" = true;
+      "git.enableCommitSigning" = true;
+      "editor.fontFamily" = "'FiraCode Nerd Font', 'DroidSans Nerd Font', Menlo, Monaco, 'Courier New', monospace";
+      "nix.enableLanguageServer" = true;
+      "nix.serverPath" = "nixd";
+      "terminal.integrated.automationProfile.linux" = { };
+      "terminal.integrated.defaultProfile.osx" = "zsh";
+      "terminal.integrated.defaultProfile.linux" = "zsh";
+      "terminal.integrated.enableMultiLinePasteWarning" = false;
+      "terminal.integrated.env.linux" = { };
+      "terminal.integrated.env.osx" = { };
+      "workbench.sideBar.location" = "right";
+    };
     extensions =
       # with (nix-vscode-extensions.forVSCodeVersion config.programs.vscode.package.version).vscode-marketplace;
       with nix-vscode-extensions.vscode-marketplace;

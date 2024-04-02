@@ -201,11 +201,12 @@
                 };
               };
               nixosConfigurations = rec {
-                vmware-aarch64 = nixosSystem {
-                  system = "aarch64-linux";
+                vmware = nixosSystem {
+                  # system = "aarch64-linux";
+                  inherit system;
                   modules = attrValues self.nixosModules ++ [
                     # hardware config
-                    ./hardware/vmware-aarch64.nix
+                    ./hardware/vmware-${system}.nix
                     # vmware.guest module overrides
                     ./modules/vmware-guests.nix
                     # nixos config
