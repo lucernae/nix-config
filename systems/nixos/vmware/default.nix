@@ -11,9 +11,9 @@
         speedFactor = 2;
       }
       {
-        hostName = "ssh://linux-builder";
+        hostName = "linux-builder";
         systems = [ "x86_64-linux" "aarch64-linux" ];
-        maxJobs = 1;
+        maxJobs = 3;
         speedFactor = 2;
       }
     ];
@@ -22,10 +22,10 @@
       "@admin"
       "@wheel"
     ];
-    settings.substituters = [
+    settings.substituters = pkgs.lib.optionals true [
       "http://nix-cache.maulana.id"
     ];
-    settings.trusted-public-keys = [
+    settings.trusted-public-keys = pkgs.lib.optionals true  [
       "nix-cache.maulana.id:PYgqkzRGbXkj3S9i/81ripyCBt1QULks55VuOeJ8FHo="
     ];
     settings.builders-use-substitutes = true;
@@ -162,7 +162,7 @@
     #  wget
     pkgs.home-manager
     pciutils
-    bitwarden
+    # bitwarden
     tailscale
     open-vm-tools
     libsForQt5.filelight

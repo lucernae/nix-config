@@ -3,16 +3,16 @@
 
   inputs = {
     # for nixpkgs
-    nixpkgs-stable.url = github:nixos/nixpkgs/nixpkgs-22.05-darwin;
-    nixpkgs.url = github:NixOS/nixpkgs/nixpkgs-unstable;
-    nixpkgs-unstable.url = github:NixOS/nixpkgs/nixpkgs-unstable;
+    nixpkgs-stable.url = github:nixos/nixpkgs/nixos-23.11;
+    nixpkgs.url = github:NixOS/nixpkgs/nixos-23.11;
+    nixpkgs-unstable.url = github:NixOS/nixpkgs/nixos-unstable;
     # for mac setup using nix-darwin
     darwin.url = github:lnl7/nix-darwin/master;
     darwin.inputs.nixpkgs.follows = "nixpkgs-unstable";
     flake-utils.url = github:numtide/flake-utils;
     # home manager
     home-manager.url = github:nix-community/home-manager;
-    home-manager.inputs.nixpkgs.follows = "nixpkgs-unstable";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
     # devenv
     devenv.url = "github:cachix/devenv/latest";
     # VS Code Nix Community
