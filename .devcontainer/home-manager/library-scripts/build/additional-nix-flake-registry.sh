@@ -10,7 +10,7 @@ if [[ -n "${ADDITIONAL_NIX_FLAKE_REGISTRY}" ]]; then
     echo
 
     # retrieve channels
-    IFS="," 
+    IFS=","
     read -a channels<<<"${ADDITIONAL_NIX_FLAKE_REGISTRY}"
     for channel in "${channels[@]}";
     do
@@ -20,7 +20,7 @@ if [[ -n "${ADDITIONAL_NIX_FLAKE_REGISTRY}" ]]; then
         nix registry add $name "$url"
     done
     echo
-    echo 
+    echo
     nix registry list
     echo
 fi

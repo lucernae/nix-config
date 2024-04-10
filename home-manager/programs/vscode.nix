@@ -45,6 +45,7 @@ with pkgs;
         graphql.vscode-graphql
         graphql.vscode-graphql-syntax
         leanprover.lean4
+        dnicolson.binary-plist
       ]
       # ++ (lib.optionals stdenv.isDarwin [ withfig.fig ])
     ;

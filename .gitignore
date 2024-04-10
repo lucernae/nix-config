@@ -4,3 +4,7 @@ result
 !.vscode/tasks.json
 .DS_Store
 .devcontainer
+.direnv
+.devshell
+
+*.pem

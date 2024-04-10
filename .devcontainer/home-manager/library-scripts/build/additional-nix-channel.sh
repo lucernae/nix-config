@@ -8,7 +8,7 @@ if [[ -n "${ADDITIONAL_NIX_CHANNEL}" ]]; then
     nix-channel --list
 
     # retrieve channels
-    IFS="," 
+    IFS=","
     read -a channels<<<"${ADDITIONAL_NIX_CHANNEL}"
     for channel in "${channels[@]}";
     do

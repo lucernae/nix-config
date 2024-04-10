@@ -25,7 +25,7 @@
     settings.substituters = pkgs.lib.optionals true [
       "http://nix-cache.maulana.id"
     ];
-    settings.trusted-public-keys = pkgs.lib.optionals true  [
+    settings.trusted-public-keys = pkgs.lib.optionals true [
       "nix-cache.maulana.id:PYgqkzRGbXkj3S9i/81ripyCBt1QULks55VuOeJ8FHo="
     ];
     settings.builders-use-substitutes = true;

@@ -33,7 +33,7 @@
       gpgconf --launch gpg-agent
 
       # Sourcing custom scripts
-      source ~/.scripts/zsh/ssh.sh
+      source ~/.scripts/zsh/*.sh
 
       # Fig post block. Keep at the bottom of this file.
       [[ -f "$HOME/.fig/shell/zshrc.post.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.post.zsh"
@@ -63,17 +63,18 @@
       ];
     };
     shellAliases = {
+      # home-manager
       hm = "home-manager";
       hms = "home-manager switch";
       hmsf = "home-manager switch --flake ~/.config/nix-config/home-manager#$(whoami)";
       hmb = "home-manager build";
-      drs = "darwin-rebuild switch";
-      drsf = "darwin-rebuild switch --flake ~/.config/nix-config";
-      drb = "darwin-rebuild build";
+      # nixos-rebuild
       nrs = "sudo nixos-rebuild switch";
       nrsf = "sudo nixos-rebuild switch --flake ~/.config/nix-config";
       nrb = "nixos-rebuild build";
+      # sshagent
       sagent = "sshagent_init";
+      # git
       gca = "git commit -a -m";
       gcammend = "git commit -a --amend --no-edit";
       gpo = "git pull origin --rebase";
@@ -88,6 +89,13 @@
     } // (
       pkgs.lib.optionalAttrs pkgs.stdenv.isDarwin {
         # macos specific
+        # darwin-rebuild
+        drs = "darwin-rebuild switch";
+        drsf = "darwin-rebuild switch --flake ~/.config/nix-config";
+        drb = "darwin-rebuild build";
+
+        # launchctl
+        lcr = "launchctl_restart";
         # macos screensharing enable
         msse = "sudo defaults write /var/db/launchd.db/com.apple.launchd/overrides.plist com.apple.screensharing -dict Disabled -bool false && sudo launchctl load -w /System/Library/LaunchDaemons/com.apple.screensharing.plist";
         mssd = "sudo defaults write /var/db/launchd.db/com.apple.launchd/overrides.plist com.apple.screensharing -dict Disabled -bool true && sudo launchctl unload -w /System/Library/LaunchDaemons/com.apple.screensharing.plist";

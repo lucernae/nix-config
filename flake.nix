@@ -15,6 +15,9 @@
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     # devenv
     devenv.url = "github:cachix/devenv/latest";
+    # devshell
+    devshell.url = "github:numtide/devshell";
+    devshell.inputs.nixpkgs.follows = "nixpkgs-unstable";
     # VS Code Nix Community
     nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
     # Pinentry-Box
@@ -59,6 +62,7 @@
     , flake-utils
     , home-manager
     , devenv
+    , devshell
     , nix-vscode-extensions
     , pinentry-box
     , nix-homebrew
@@ -158,6 +162,7 @@
 
                     # nix-darwin configuration
                     ./systems/nix-darwin/recalune
+                    ./systems/nix-darwin/recalune/mac-defaults.nix
                     # home-manager
                     home-manager.darwinModules.home-manager
                     {
@@ -248,6 +253,29 @@
 
           # extra nixosModules not yet available in upstreams
           nixosModules = { };
+
+          # devshell for cli shortcuts
+          devShells.default =
+            let
+              pkgs = import nixpkgs {
+                inherit system;
+                overlays = [ devshell.overlays.default ];
+              };
+            in
+            pkgs.devshell.mkShell {
+              name = "nix-config";
+              commands = [
+                {
+                  name = "pre-commit";
+                  package = pkgs.pre-commit;
+                }
+                {
+                  name = "pcr";
+                  help = "pre-commit run --all-files";
+                  command = "pre-commit run --all-files";
+                }
+              ];
+            };
         }
       );
 }
