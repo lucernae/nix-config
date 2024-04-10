@@ -162,7 +162,6 @@
 
                     # nix-darwin configuration
                     ./systems/nix-darwin/recalune
-                    ./systems/nix-darwin/recalune/mac-defaults.nix
                     # home-manager
                     home-manager.darwinModules.home-manager
                     {
