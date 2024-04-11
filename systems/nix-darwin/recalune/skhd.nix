@@ -19,8 +19,10 @@
       # display focus change
       alt - f : yabai -m display --focus west
       alt - g : yabai -m display --focus east
+
       # for alternating between display
       alt - h : yabai -m display --focus recent
+
       # immediate display targeting
       ctrl + alt - 1 : yabai -m display --focus 1
       ctrl + alt - 2 : yabai -m display --focus 2
@@ -43,6 +45,9 @@
       # balancing space
       shift + alt - h : yabai -m space --balance
 
+      # focus on whatever window is currently under the cursor
+      shift + alt - f : yabai -m window --focus mouse
+
       # swap windows
       shift + alt - k : yabai -m window --swap south
       shift + alt - i : yabai -m window --swap north
@@ -56,19 +61,31 @@
       ctrl + alt - l : yabai -m window --warp east
 
       # move window over spaces
-      shift + alt - v : yabai -m window --space prev
-      shift + alt - b : yabai -m window --space next
+      # this is a bash script logic, so chaining with && means the last focus won't happen if the movement fails
+      shift + alt - v : yabai -m window --space prev && \
+        yabai -m window --focus recent
+      shift + alt - b : yabai -m window --space next && \
+        yabai -m window --focus recent
 
       # move window to space
-      shift + alt - 1 : yabai -m window --space 1
-      shift + alt - 2 : yabai -m window --space 2
-      shift + alt - 3 : yabai -m window --space 3
-      shift + alt - 4 : yabai -m window --space 4
-      shift + alt - 5 : yabai -m window --space 5
-      shift + alt - 6 : yabai -m window --space 6
-      shift + alt - 7 : yabai -m window --space 7
-      shift + alt - 8 : yabai -m window --space 8
-      shift + alt - 9 : yabai -m window --space 9
+      shift + alt - 1 : yabai -m window --space 1 && \
+        yabai -m window --focus recent
+      shift + alt - 2 : yabai -m window --space 2 && \
+        yabai -m window --focus recent
+      shift + alt - 3 : yabai -m window --space 3 && \
+        yabai -m window --focus recent
+      shift + alt - 4 : yabai -m window --space 4 && \
+        yabai -m window --focus recent
+      shift + alt - 5 : yabai -m window --space 5 && \
+        yabai -m window --focus recent
+      shift + alt - 6 : yabai -m window --space 6 && \
+        yabai -m window --focus recent
+      shift + alt - 7 : yabai -m window --space 7 && \
+        yabai -m window --focus recent
+      shift + alt - 8 : yabai -m window --space 8 && \
+        yabai -m window --focus recent
+      shift + alt - 9 : yabai -m window --space 9 && \
+        yabai -m window --focus recent
 
       # start stop yabai
       ctrl + alt - q : launchctl stop org.nixos.yabai
