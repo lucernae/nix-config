@@ -53,6 +53,10 @@
       url = "github:LizardByte/homebrew-homebrew";
       flake = false;
     };
+    homebrew-zeek = {
+      url = "github:zeek/homebrew-zeek";
+      flake = false;
+    };
   };
 
   outputs =
@@ -73,6 +77,7 @@
     , homebrew-cask-fonts
     , homebrew-apple
     , homebrew-lizardbyte
+    , homebrew-zeek
     , ...
     }@inputs:
     let
@@ -152,6 +157,7 @@
                           "homebrew/homebrew-cask-drivers" = homebrew-cask-drivers;
                           "homebrew/homebrew-cask-fonts" = homebrew-cask-fonts;
                           "apple/homebrew-apple" = homebrew-apple;
+                          "zeek/homebrew-zeek" = homebrew-zeek;
                           "LizardByte/homebrew-homebrew" = homebrew-lizardbyte;
                         };
 

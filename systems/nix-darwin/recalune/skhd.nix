@@ -28,25 +28,25 @@
       ctrl + alt - 2 : yabai -m display --focus 2
 
       # rotate layout clockwise
-      shift + alt - r : yabai -m space --rotate 270
+      ctrl + shift + alt - r : yabai -m space --rotate 270
 
       # flip along y-axis
-      shift + alt - t : yabai -m space --mirror y-axis
+      ctrl + shift + alt - t : yabai -m space --mirror y-axis
 
       # flip along x-axis
-      shift + alt - e : yabai -m space --mirror x-axis
+      ctrl + shift + alt - e : yabai -m space --mirror x-axis
 
       # toggle window float
-      shift + alt - q : yabai -m window --toggle float --grid 4:4:1:1:2:2
+      ctrl + shift + alt - q : yabai -m window --toggle float --grid 4:4:1:1:2:2
 
       # maximize window
-      shift + alt - c : yabai -m window --toggle zoom-fullscreen
+      ctrl + shift + alt - c : yabai -m window --toggle zoom-fullscreen
 
       # balancing space
-      shift + alt - h : yabai -m space --balance
+      ctrl + shift + alt - h : yabai -m space --balance
 
       # focus on whatever window is currently under the cursor
-      shift + alt - f : yabai -m window --focus mouse
+      ctrl + shift + alt - f : yabai -m window --focus mouse
 
       # swap windows
       shift + alt - k : yabai -m window --swap south

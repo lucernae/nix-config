@@ -158,6 +158,7 @@
       "keycastr"
       "raycast"
       "shortcat"
+      #      "barrier"
       # no casks for homerow yet.
     ];
   };
