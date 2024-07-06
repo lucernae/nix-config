@@ -46,6 +46,7 @@ with pkgs;
         graphql.vscode-graphql-syntax
         leanprover.lean4
         dnicolson.binary-plist
+        garmin.monkey-c
       ]
       # ++ (lib.optionals stdenv.isDarwin [ withfig.fig ])
     ;
