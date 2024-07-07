@@ -19,9 +19,11 @@
     # programming languages related
     go
     wasmtime
-    python3
-    python3Packages.pip
-    python3Packages.virtualenv
+    (python3.withPackages (ps: with ps; [
+      pip
+      virtualenv
+      jupyter
+    ]))
     cmake
     yarn
     poetry

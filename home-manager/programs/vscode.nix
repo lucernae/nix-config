@@ -38,6 +38,8 @@ with pkgs;
         ms-vscode-remote.remote-ssh-edit
         ms-vscode-remote.remote-wsl
         ms-vscode-remote.vscode-remote-extensionpack
+        ms-python.python
+        ms-toolsai.jupyter
         eamodio.gitlens
         redhat.vscode-yaml
         tailscale.vscode-tailscale
