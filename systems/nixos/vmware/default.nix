@@ -97,7 +97,7 @@
   services.xserver.enable = true;
 
   # Enable the KDE Plasma Desktop Environment.
-  services.xserver.displayManager.sddm.enable = true;
+  services.displayManager.sddm.enable = true;
   services.xserver.desktopManager.plasma5.enable = true;
 
   # Configure keymap in X11
@@ -110,7 +110,7 @@
   services.printing.enable = true;
 
   # Enable sound with pipewire.
-  sound.enable = true;
+  # sound.enable = true;
   hardware.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
@@ -147,8 +147,8 @@
   };
 
   # Enable automatic login for the user.
-  services.xserver.displayManager.autoLogin.enable = true;
-  services.xserver.displayManager.autoLogin.user = "vmware";
+  services.displayManager.autoLogin.enable = true;
+  services.displayManager.autoLogin.user = "vmware";
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
@@ -166,6 +166,10 @@
     tailscale
     open-vm-tools
     libsForQt5.filelight
+    vlc
+    qemu
+    spice-gtk
+    quickemu
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -215,6 +219,7 @@
   security.sudo.wheelNeedsPassword = false;
   # security.pam.services.vmware.enableGnomeKeyring = true;
   virtualisation.vmware.guestCustom.enable = true;
+  # services.xserver.videoDrivers = ["vmware"];
   virtualisation.docker.enable = true;
 
   fonts.fontDir.enable = true;
