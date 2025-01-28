@@ -18,6 +18,8 @@ with pkgs;
       "terminal.integrated.enableMultiLinePasteWarning" = false;
       "terminal.integrated.env.linux" = { };
       "terminal.integrated.env.osx" = { };
+      "terminal.external.osxExec" = "/opt/homebrew/bin/ghostty";
+      "terminal.explorerKind" = "external";
       "workbench.sideBar.location" = "right";
     };
     extensions =
@@ -49,6 +51,8 @@ with pkgs;
         leanprover.lean4
         dnicolson.binary-plist
         garmin.monkey-c
+        amazonwebservices.amazon-q-vscode
+        sourcegraph.cody-ai
       ]
       # ++ (lib.optionals stdenv.isDarwin [ withfig.fig ])
     ;

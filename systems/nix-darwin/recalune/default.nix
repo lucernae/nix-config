@@ -23,7 +23,7 @@
         speedFactor = 2;
       }
     ];
-    distributedBuilds = false;
+    distributedBuilds = true;
     settings.trusted-users = [
       "@admin"
       "@wheel"
@@ -137,7 +137,6 @@
       Line = 539883307;
     };
     casks = [
-      "fig"
       "notion-calendar"
       "signal"
       "discord"
@@ -158,6 +157,7 @@
       "keycastr"
       "raycast"
       "shortcat"
+      "ghostty"
       #      "barrier"
       # no casks for homerow yet.
     ];

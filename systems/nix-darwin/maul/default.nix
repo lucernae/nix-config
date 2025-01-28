@@ -54,7 +54,6 @@
       "mas"
     ];
     casks = [
-      "fig"
       "cron"
     ];
   };

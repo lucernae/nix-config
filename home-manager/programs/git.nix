@@ -3,6 +3,7 @@ with pkgs;
 {
   programs.git = {
     enable = true;
+    lfs.enable = true;
     userName = "Rizky Maulana Nugraha";
     userEmail = "lana.pcfre@gmail.com";
     signing = {
