@@ -126,129 +126,142 @@
               };
             };
           };
+
+          isDarwin = system: builtins.elem system [
+            flake-utils.lib.system.x86_64-darwin
+            flake-utils.lib.system.aarch64-darwin
+          ];
+
+          isLinux = system: builtins.elem system [
+            flake-utils.lib.system.x86_64-linux
+            flake-utils.lib.system.aarch64-linux
+          ];
         in
         {
           formatter = nixpkgs.legacyPackages.${system}.nixpkgs-fmt;
           packages =
             {
-              darwinConfigurations = rec {
-                recalune = darwinSystem {
-                  inherit system;
-                  modules = attrValues self.darwinModules ++ [
-                    # modules
-                    # ./services/nix-serve
-                    nix-homebrew.darwinModules.nix-homebrew
-                    {
-                      nix-homebrew = {
-                        # Install Homebrew under the default prefix
-                        enable = true;
+              darwinConfigurations =
+                if isDarwin system then rec {
+                  recalune = darwinSystem {
+                    inherit system;
+                    modules = attrValues self.darwinModules ++ [
+                      # modules
+                      # ./services/nix-serve
+                      nix-homebrew.darwinModules.nix-homebrew
+                      {
+                        nix-homebrew = {
+                          # Install Homebrew under the default prefix
+                          enable = true;
 
-                        # Apple Silicon Only: Also install Homebrew under the default Intel prefix for Rosetta 2
-                        enableRosetta = true;
+                          # Apple Silicon Only: Also install Homebrew under the default Intel prefix for Rosetta 2
+                          enableRosetta = true;
 
-                        # User owning the Homebrew prefix
-                        user = "recalune";
+                          # User owning the Homebrew prefix
+                          user = "recalune";
 
-                        # taps
-                        taps = {
-                          "homebrew/homebrew-core" = homebrew-core;
-                          "homebrew/homebrew-bundle" = homebrew-bundle;
-                          "homebrew/homebrew-cask" = homebrew-cask;
-                          "homebrew/homebrew-cask-drivers" = homebrew-cask-drivers;
-                          "homebrew/homebrew-cask-fonts" = homebrew-cask-fonts;
-                          "apple/homebrew-apple" = homebrew-apple;
-                          "zeek/homebrew-zeek" = homebrew-zeek;
-                          "LizardByte/homebrew-homebrew" = homebrew-lizardbyte;
+                          # taps
+                          taps = {
+                            "homebrew/homebrew-core" = homebrew-core;
+                            "homebrew/homebrew-bundle" = homebrew-bundle;
+                            "homebrew/homebrew-cask" = homebrew-cask;
+                            "homebrew/homebrew-cask-drivers" = homebrew-cask-drivers;
+                            "homebrew/homebrew-cask-fonts" = homebrew-cask-fonts;
+                            "apple/homebrew-apple" = homebrew-apple;
+                            "zeek/homebrew-zeek" = homebrew-zeek;
+                            "LizardByte/homebrew-homebrew" = homebrew-lizardbyte;
+                          };
+
+                          # Automatically migrate existing Homebrew installations
+                          autoMigrate = true;
                         };
+                      }
 
-                        # Automatically migrate existing Homebrew installations
-                        autoMigrate = true;
-                      };
-                    }
+                      # nix-darwin configuration
+                      ./systems/nix-darwin/recalune
+                      # home-manager
+                      home-manager.darwinModules.home-manager
+                      {
+                        nixpkgs = nixpkgsConfig;
+                        # `home-manager` config
+                        home-manager.useGlobalPkgs = true;
+                        home-manager.useUserPackages = true;
+                        home-manager.users.recalune = import ./home-manager/recalune.nix;
 
-                    # nix-darwin configuration
-                    ./systems/nix-darwin/recalune
-                    # home-manager
-                    home-manager.darwinModules.home-manager
-                    {
-                      nixpkgs = nixpkgsConfig;
-                      # `home-manager` config
-                      home-manager.useGlobalPkgs = true;
-                      home-manager.useUserPackages = true;
-                      home-manager.users.recalune = import ./home-manager/recalune.nix;
+                        # pass to home configuration
+                        home-manager.extraSpecialArgs = {
+                          inherit (devenv.packages.${system}) devenv;
+                        };
+                      }
+                      # tailscale
+                      # ./services/tailscale
+                    ];
+                    # inputs = { inherit darwin nixpkgs; };
+                    inputs = { inherit darwin; };
+                  };
 
-                      # pass to home configuration
-                      home-manager.extraSpecialArgs = {
-                        inherit (devenv.packages.${system}) devenv;
-                      };
-                    }
-                    # tailscale
-                    # ./services/tailscale
-                  ];
-                  # inputs = { inherit darwin nixpkgs; };
-                  inputs = { inherit darwin; };
-                };
+                  maul = darwinSystem {
+                    inherit system;
+                    modules = attrValues self.darwinModules ++ [
+                      # nix-darwin configuration
+                      ./systems/nix-darwin/maul
+                      # home-manager
+                      home-manager.darwinModules.home-manager
+                      {
+                        nixpkgs = nixpkgsConfig;
+                        # `home-manager` config
+                        home-manager.useGlobalPkgs = true;
+                        home-manager.useUserPackages = true;
+                        home-manager.users.maul = import ./home-manager/maul.nix;
+                      }
+                      # tailscale
+                      ./services/tailscale
+                    ];
+                    # inputs = { inherit darwin nixpkgs; };
+                    inputs = { inherit darwin; };
+                  };
+                } else { };
 
-                maul = darwinSystem {
-                  inherit system;
-                  modules = attrValues self.darwinModules ++ [
-                    # nix-darwin configuration
-                    ./systems/nix-darwin/maul
-                    # home-manager
-                    home-manager.darwinModules.home-manager
-                    {
-                      nixpkgs = nixpkgsConfig;
-                      # `home-manager` config
-                      home-manager.useGlobalPkgs = true;
-                      home-manager.useUserPackages = true;
-                      home-manager.users.maul = import ./home-manager/maul.nix;
-                    }
-                    # tailscale
-                    ./services/tailscale
-                  ];
-                  # inputs = { inherit darwin nixpkgs; };
-                  inputs = { inherit darwin; };
-                };
-              };
-              nixosConfigurations = rec {
-                vmware = nixosSystem {
-                  # system = "aarch64-linux";
-                  inherit system;
-                  modules = attrValues self.nixosModules ++ [
-                    # hardware config
-                    ./hardware/vmware-${system}.nix
-                    # vmware.guest module overrides
-                    ./modules/vmware-guests.nix
-                    # nixos config
-                    ./systems/nixos/vmware
-                    # home-manager
-                    home-manager.nixosModules.home-manager
-                    {
-                      nixpkgs = nixpkgsConfig;
-                      # `home-manager` config
-                      home-manager.useGlobalPkgs = true;
-                      home-manager.useUserPackages = true;
-                      home-manager.users.vmware = import ./home-manager/vmware.nix;
+              nixosConfigurations =
+                if isLinux system then rec {
+                  vmware = nixosSystem {
+                    # system = "aarch64-linux";
+                    inherit system;
+                    modules = attrValues self.nixosModules ++ [
+                      # hardware config
+                      ./hardware/vmware-${system}.nix
+                      # vmware.guest module overrides
+                      ./modules/vmware-guests.nix
+                      # nixos config
+                      ./systems/nixos/vmware
+                      # home-manager
+                      home-manager.nixosModules.home-manager
+                      {
+                        nixpkgs = nixpkgsConfig;
+                        # `home-manager` config
+                        home-manager.useGlobalPkgs = true;
+                        home-manager.useUserPackages = true;
+                        home-manager.users.vmware = import ./home-manager/vmware.nix;
 
-                      # pass to home configuration
-                      home-manager.extraSpecialArgs = {
-                        inherit (devenv.packages.${system}) devenv;
-                      };
-                    }
-                    # tailscale
-                    # ./services/tailscale
-                  ];
-                };
+                        # pass to home configuration
+                        home-manager.extraSpecialArgs = {
+                          inherit (devenv.packages.${system}) devenv;
+                        };
+                      }
+                      # tailscale
+                      # ./services/tailscale
+                    ];
+                  };
 
-                # to build: nix build github:lucernae/nix-config#nixosConfigurations.raspberry-pi_3.config.system.build.sdImage
-                raspberry-pi_3 = nixosSystem {
-                  system = "aarch64-linux";
-                  modules = attrValues self.nixosModules ++ [
-                    "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64-installer.nix"
-                    ./systems/nixos/raspi/configuration.nix
-                  ];
-                };
-              };
+                  # to build: nix build github:lucernae/nix-config#nixosConfigurations.raspberry-pi_3.config.system.build.sdImage
+                  raspberry-pi_3 = nixosSystem {
+                    system = "aarch64-linux";
+                    modules = attrValues self.nixosModules ++ [
+                      "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64-installer.nix"
+                      ./systems/nixos/raspi/configuration.nix
+                    ];
+                  };
+                } else { };
             };
 
           # extra darwinModules not yet available in upstreams
