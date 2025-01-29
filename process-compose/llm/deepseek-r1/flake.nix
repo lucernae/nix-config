@@ -23,7 +23,8 @@
           let
             # default ollama port
             port = 11434;
-          in {
+          in
+          {
             cli = {
               # Environment configurations
             };
