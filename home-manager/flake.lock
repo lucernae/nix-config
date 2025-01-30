@@ -73,15 +73,16 @@
         "nixpkgs": "nixpkgs_7"
       },
       "locked": {
-        "lastModified": 1,
-        "narHash": "sha256-3gX9ZO1qCI8MvROgH7asLQEOaIWnrbX2u7+bLuqvOek=",
         "path": "../common",
         "type": "path"
       },
       "original": {
         "path": "../common",
         "type": "path"
-      }
+      },
+      "parent": [
+        "pinentry-box"
+      ]
     },
     "devenv": {
       "inputs": {
