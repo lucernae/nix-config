@@ -96,6 +96,12 @@
 
         # launchctl
         lcr = "launchctl_restart";
+        reloadyabai = ''
+          launchctl unload -w ~/Library/LaunchAgents/org.nixos.yabai.plist
+          launchctl unload -w ~/Library/LaunchAgents/org.nixos.skhd.plist
+          launchctl load -w ~/Library/LaunchAgents/org.nixos.skhd.plist
+          launchctl load -w ~/Library/LaunchAgents/org.nixos.yabai.plist
+        '';
         # macos screensharing enable
         msse = "sudo defaults write /var/db/launchd.db/com.apple.launchd/overrides.plist com.apple.screensharing -dict Disabled -bool false && sudo launchctl load -w /System/Library/LaunchDaemons/com.apple.screensharing.plist";
         mssd = "sudo defaults write /var/db/launchd.db/com.apple.launchd/overrides.plist com.apple.screensharing -dict Disabled -bool true && sudo launchctl unload -w /System/Library/LaunchDaemons/com.apple.screensharing.plist";

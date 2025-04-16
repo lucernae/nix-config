@@ -12,7 +12,7 @@
     nixd
     act
     comma
-    bitwarden-cli
+    # bitwarden-cli # need to install from app
     bws
     elan
   ] ++ [
