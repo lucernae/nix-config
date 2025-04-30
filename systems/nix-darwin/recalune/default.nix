@@ -9,6 +9,7 @@
     ./mac-defaults.nix
   ];
   nix = {
+    enable = true;
     buildMachines = [
       {
         hostName = "aarch64-darwin-builder";
@@ -57,7 +58,6 @@
   # environment.darwinConfig = "$HOME/.config/nixpkgs/darwin/configuration.nix";
 
   # Auto upgrade nix package and the daemon service.
-  services.nix-daemon.enable = true;
   launchd.daemons.nix-serve = {
     serviceConfig = {
       Label = "org.nixos.nix-serve";
@@ -92,7 +92,7 @@
   #   "/usr/share/zsh"
   # ];
 
-  security.pam.enableSudoTouchIdAuth = pkgs.stdenv.isDarwin;
+  security.pam.services.sudo_local.touchIdAuth = pkgs.stdenv.isDarwin;
 
   homebrew = {
     enable = pkgs.stdenv.isDarwin;
@@ -165,7 +165,8 @@
 
   fonts.packages = with pkgs; [
     jetbrains-mono
-    (nerdfonts.override { fonts = [ "FiraCode" "DroidSansMono" ]; })
+    nerd-fonts.fira-code
+    nerd-fonts.droid-sans-mono
   ];
 
   # `home-manager` config

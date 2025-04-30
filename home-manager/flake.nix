@@ -3,9 +3,9 @@
 
   inputs = {
     # Specify the source of Home Manager and Nixpkgs.
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
     home-manager = {
-      url = "github:nix-community/home-manager";
+      url = "github:nix-community/home-manager/release-24.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Flake utils
@@ -40,9 +40,17 @@
       (
         system:
         let
+          nixpkgsConfig = {
+            config = {
+              allowUnfree = true;
+              allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) [
+                "vscode-extension-github-codespaces"
+              ];
+            };
+          };
           pkgs = import nixpkgs {
             inherit system;
-            config.allowUnfree = true;
+            inherit (nixpkgsConfig) config;
             overlays = [
               (final: prev: {
                 nix-vscode-extensions = nix-vscode-extensions.extensions.${system};
@@ -60,6 +68,9 @@
             # Specify your home configuration modules here, for example,
             # the path to your home.nix.
             modules = [
+              {
+                nixpkgs = nixpkgsConfig;
+              }
               ./recalune.nix
             ];
 
@@ -73,6 +84,9 @@
             # Specify your home configuration modules here, for example,
             # the path to your home.nix.
             modules = [
+              {
+                nixpkgs = nixpkgsConfig;
+              }
               ./vscode.nix
             ];
 
@@ -86,6 +100,9 @@
             # Specify your home configuration modules here, for example,
             # the path to your home.nix.
             modules = [
+              {
+                nixpkgs = nixpkgsConfig;
+              }
               ./vmware.nix
             ];
 

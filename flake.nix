@@ -11,7 +11,7 @@
     darwin.inputs.nixpkgs.follows = "nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
     # home manager
-    home-manager.url = "github:nix-community/home-manager";
+    home-manager.url = "github:nix-community/home-manager/release-24.11";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     # devenv
     devenv.url = "github:cachix/devenv/latest";
@@ -98,6 +98,9 @@
           nixpkgsConfig = {
             config = {
               allowUnfree = true;
+              allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) [
+                "vscode-extension-github-codespaces"
+              ];
               allowUnsupportedSystem = true;
             };
             overlays = attrValues overlays ++ [
