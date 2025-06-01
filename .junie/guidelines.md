@@ -119,7 +119,7 @@ This provides access to useful commands like:
 - `hardware/`: Hardware-specific configurations
 - `modules/`: Reusable Nix modules
 - `services/`: Service configurations
-- `.junie/tests/`: Test files
+- `templates/` : Useful flake templates
 
 ### Updating Dependencies
 
