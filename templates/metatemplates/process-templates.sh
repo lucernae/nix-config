@@ -105,7 +105,8 @@ process_file() {
         context_file = import $CONTEXT_FILE;
         context = context_file.context;
         utils = lib.attrByPath [\"utils\"] {} context_file;
-        content = ''$content'';
+        content = ''$content
+        '';
       in
         content
     " --strict --raw > "$target_file"

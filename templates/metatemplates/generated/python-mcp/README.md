@@ -73,7 +73,7 @@ To run the example:
 source .venv/bin/activate
 
 # Run the greeting tool server
-python examples/greeting/greeting_tool.py
+python src/examples/greeting/greeting_tool.py
 ```
 
 You can also try the client example to see how to use the tools programmatically:
@@ -81,16 +81,16 @@ You can also try the client example to see how to use the tools programmatically
 ```bash
 # In a separate terminal, with the server running
 source .venv/bin/activate
-python examples/greeting/client_example.py
+python src/examples/greeting/client_example.py
 ```
 
-For more details, see the [Greeting Tool Example README](examples/greeting/README.md).
+For more details, see the [Greeting Tool Example README](src/examples/greeting/README.md).
 
 ## Project Structure
 
 - `pyproject.toml`: Project configuration and dependencies
 - `README.md`: This file
-- `examples/`: Example projects
+- `src/examples/`: Example projects
   - `greeting/`: A simple greeting tool example
 
 ## Development

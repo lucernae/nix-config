@@ -41,7 +41,6 @@ disallow_incomplete_defs = true
 
 [tool.hatch.build]
 packages = ["src/examples"]
-package-dir = "src"
 
 [tool.hatch.build.targets.wheel]
 only-include = ["src"]

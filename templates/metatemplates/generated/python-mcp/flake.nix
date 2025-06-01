@@ -25,7 +25,6 @@
             ${pkgs.uv}/bin/uvx --from ${./.} mcp-server
           '');
         };
-
         devShells.default = pkgs.devshell.mkShell {
           name = "python-mcp";
           packages = with pkgs; [
@@ -53,6 +52,11 @@
               name = "run-mcp";
               help = "Run the MCP server using uv run";
               command = "uv run mcp-server";
+            }
+            {
+              name = "run-greeting";
+              help = "Run the greeting tool example using uv run";
+              command = "uv run greeting-tool";
             }
           ];
 

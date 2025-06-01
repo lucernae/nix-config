@@ -1,16 +1,20 @@
 [build-system]
-requires = ["setuptools>=42", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["${context.build-system}"]
+build-backend = "${context.build-system}.build"
 
 [project]
-name = "mcp-project"
-version = "0.1.0"
-description = "A Model Context Protocol (MCP) project"
+name = "${context.project-name}"
+version = "${context.project-version}"
+description = "${context.project-description}"
 readme = "README.md"
 requires-python = ">=${context.python-version}"
 dependencies = [
+    "asyncio>=3.4.3",
     "fastmcp",
 ]
+
+[project.scripts]
+mcp-server = "examples.greeting.greeting_tool:main"
 
 [project.optional-dependencies]
 dev = [
@@ -34,3 +38,15 @@ warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
 disallow_incomplete_defs = true
+
+[tool.hatch.build]
+packages = ["src/examples"]
+
+[tool.hatch.build.targets.wheel]
+only-include = ["src"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src",
+    "README.md",
+]
