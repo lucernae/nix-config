@@ -1,10 +1,13 @@
 { config, pkgs, ... }:
+let
+  trace-enable = builtins.trace "checking nixpkgs config.allowUnfree: ${builtins.toJSON pkgs.config.allowUnfree}" (true);
+in
 with pkgs;
 {
   # https://github.com/nix-community/home-manager/blob/master/modules/programs/vscode.nix
   # https://github.com/nix-community/nix-vscode-extensions
   programs.vscode = {
-    enable = true;
+    enable = trace-enable;
     profiles.default = {
       enableUpdateCheck = true;
       userSettings = {

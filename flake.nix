@@ -302,6 +302,11 @@
                   help = "run nix brew update";
                   command = "nix flake lock --update-input $@";
                 }
+                {
+                  name = "push-to-cache";
+                  help = "push derivation to cache. useful to send builds. to get the derivation path, use `readlink ~/.local/state/nix/profile/home-manager` as example";
+                  command = "nix copy --to ssh://root@nix-cache.maulana.id $@";
+                }
               ];
             };
         }
