@@ -17,11 +17,11 @@
     devenv.url = "github:cachix/devenv/latest";
     # devshell
     devshell.url = "github:numtide/devshell";
-    devshell.inputs.nixpkgs.follows = "nixpkgs-unstable";
+    devshell.inputs.nixpkgs.follows = "nixpkgs";
     # VS Code Nix Community
     nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
     # Pinentry-Box
-    pinentry-box.url = "github:lucernae/pinentry-box?dir=pinentry-box";
+    pinentry-box.url = "github:lucernae/pinentry-box/daemon-mode?dir=pinentry-box";
     # nix-homebrew
     nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
     # nix-homebrew tap
@@ -63,6 +63,7 @@
     { self
     , darwin
     , nixpkgs
+    , nixpkgs-unstable
     , flake-utils
     , home-manager
     , devenv
@@ -288,7 +289,8 @@
               commands = [
                 {
                   name = "pre-commit";
-                  package = pkgs.pre-commit;
+                  # uses unstable package because stable package pre-commit somehow builds nodejs since it doesn't exists in cache
+                  package = nixpkgs-unstable.legacyPackages.${system}.pre-commit;
                 }
                 {
                   name = "pcr";

@@ -66,11 +66,11 @@
       # home-manager
       hm = "home-manager";
       hms = "home-manager switch";
-      hmsf = "home-manager switch --flake ~/.config/nix-config/home-manager#$(whoami)";
+      hmsf = "NIXPKGS_ALLOW_UNFREE=1 home-manager switch --impure --flake ~/.config/nix-config/home-manager#$(whoami)";
       hmb = "home-manager build";
       # nixos-rebuild
       nrs = "sudo nixos-rebuild switch";
-      nrsf = "sudo nixos-rebuild switch --flake ~/.config/nix-config";
+      nrsf = "NIXPKGS_ALLOW_UNFREE=1 sudo nixos-rebuild switch --impure --flake ~/.config/nix-config";
       nrb = "nixos-rebuild build";
       # sshagent
       sagent = "sshagent_init";
@@ -91,7 +91,7 @@
         # macos specific
         # darwin-rebuild
         drs = "darwin-rebuild switch";
-        drsf = "darwin-rebuild switch --flake ~/.config/nix-config";
+        drsf = "NIXPKGS_ALLOW_UNFREE=1 darwin-rebuild switch --impure --flake ~/.config/nix-config";
         drb = "darwin-rebuild build";
 
         # launchctl

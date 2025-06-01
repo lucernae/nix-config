@@ -114,7 +114,7 @@
     "devshell": {
       "inputs": {
         "nixpkgs": [
-          "nixpkgs-unstable"
+          "nixpkgs"
         ]
       },
       "locked": {
@@ -835,16 +835,17 @@
       },
       "locked": {
         "dir": "pinentry-box",
-        "lastModified": 1745989804,
-        "narHash": "sha256-C7/bnXpgKmhxWoCYNCcSN90tEIkYQ/04n8Eo29jSA0w=",
+        "lastModified": 1746109304,
+        "narHash": "sha256-NtmkUHKelWqAeLfIEP7Da5eEs7dujdHAgEu4JGfUca4=",
         "owner": "lucernae",
         "repo": "pinentry-box",
-        "rev": "f7fa28225d5face7ee265777c8f7db07f8c1269a",
+        "rev": "8d57760200be7644a3d538c4f7e5f6ec74198dee",
         "type": "github"
       },
       "original": {
         "dir": "pinentry-box",
         "owner": "lucernae",
+        "ref": "daemon-mode",
         "repo": "pinentry-box",
         "type": "github"
       }

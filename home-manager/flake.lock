@@ -35,14 +35,19 @@
         "nixpkgs": "nixpkgs_7"
       },
       "locked": {
-        "lastModified": 1,
-        "narHash": "sha256-3gX9ZO1qCI8MvROgH7asLQEOaIWnrbX2u7+bLuqvOek=",
-        "path": "../common",
-        "type": "path"
+        "dir": "common",
+        "lastModified": 1737939338,
+        "narHash": "sha256-gbxz4fg3BW34PId77egEqZChJe63SxLEMqZvwFpEWIE=",
+        "owner": "lucernae",
+        "repo": "pinentry-box",
+        "rev": "c775b43bec764161044a4cce898b233ddd1ddd46",
+        "type": "github"
       },
       "original": {
-        "path": "../common",
-        "type": "path"
+        "dir": "common",
+        "owner": "lucernae",
+        "repo": "pinentry-box",
+        "type": "github"
       }
     },
     "devenv": {
@@ -545,11 +550,11 @@
       },
       "locked": {
         "dir": "pinentry-box",
-        "lastModified": 1737939338,
-        "narHash": "sha256-gbxz4fg3BW34PId77egEqZChJe63SxLEMqZvwFpEWIE=",
+        "lastModified": 1745989804,
+        "narHash": "sha256-C7/bnXpgKmhxWoCYNCcSN90tEIkYQ/04n8Eo29jSA0w=",
         "owner": "lucernae",
         "repo": "pinentry-box",
-        "rev": "c775b43bec764161044a4cce898b233ddd1ddd46",
+        "rev": "f7fa28225d5face7ee265777c8f7db07f8c1269a",
         "type": "github"
       },
       "original": {
