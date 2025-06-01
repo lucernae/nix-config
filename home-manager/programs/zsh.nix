@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 {
   programs.zsh = {
     enable = true;
@@ -6,38 +6,40 @@
     completionInit = ''
       autoload -Uz compinit && compinit -i
     '';
-    initExtraBeforeCompInit = ''
-      ZSH_DISABLE_COMPFIX=true
-    '';
-    initExtraFirst = ''
-      # Amazon Q pre block. Keep at the top of this file.
-      [[ -f "''${HOME}/Library/Application Support/amazon-q/shell/zshrc.pre.zsh" ]] && builtin source "''${HOME}/Library/Application Support/amazon-q/shell/zshrc.pre.zsh"
-    '';
-    initExtra = ''
-      # Set PATH, MANPATH, etc., for Homebrew.
-      # Doesn't need it now since we are using nix-homebrew
-      # Intel Mac uses this one
-      if [[ "$(uname)" == "Darwin" && "$(arch)" == "i386" ]]; then
-        eval "$(/usr/local/bin/brew shellenv)"
-      fi
-      # ARM Mac uses this one
-      if [[ "$(uname)" == "Darwin" && "$(arch)" == "arm64" ]]; then
-        eval "$(/opt/homebrew/bin/brew shellenv)"
-      fi
+    initContent = lib.mkMerge [
+      (lib.mkBefore ''
+        # Amazon Q pre block. Keep at the top of this file.
+        [[ -f "''${HOME}/Library/Application Support/amazon-q/shell/zshrc.pre.zsh" ]] && builtin source "''${HOME}/Library/Application Support/amazon-q/shell/zshrc.pre.zsh"
+      '')
+      (lib.mkOrder 550 ''
+        ZSH_DISABLE_COMPFIX=true
+      '')
+      ''
+        # Set PATH, MANPATH, etc., for Homebrew.
+        # Doesn't need it now since we are using nix-homebrew
+        # Intel Mac uses this one
+        if [[ "$(uname)" == "Darwin" && "$(arch)" == "i386" ]]; then
+          eval "$(/usr/local/bin/brew shellenv)"
+        fi
+        # ARM Mac uses this one
+        if [[ "$(uname)" == "Darwin" && "$(arch)" == "arm64" ]]; then
+          eval "$(/opt/homebrew/bin/brew shellenv)"
+        fi
 
-      # Set PATH for Rancher Desktop
-      export PATH="$HOME/.rd/bin:$PATH"
+        # Set PATH for Rancher Desktop
+        export PATH="$HOME/.rd/bin:$PATH"
 
-      # GPG
-      export GPG_TTY=$(tty)
-      gpgconf --launch gpg-agent
+        # GPG
+        export GPG_TTY=$(tty)
+        gpgconf --launch gpg-agent
 
-      # Sourcing custom scripts
-      source ~/.scripts/zsh/*.sh
+        # Sourcing custom scripts
+        source ~/.scripts/zsh/*.sh
 
-      # Amazon Q post block. Keep at the bottom of this file.
-      [[ -f "''${HOME}/Library/Application Support/amazon-q/shell/zshrc.post.zsh" ]] && builtin source "''${HOME}/Library/Application Support/amazon-q/shell/zshrc.post.zsh"
-    '';
+        # Amazon Q post block. Keep at the bottom of this file.
+        [[ -f "''${HOME}/Library/Application Support/amazon-q/shell/zshrc.post.zsh" ]] && builtin source "''${HOME}/Library/Application Support/amazon-q/shell/zshrc.post.zsh"
+      ''
+    ];
     oh-my-zsh = {
       enable = true;
       plugins = [

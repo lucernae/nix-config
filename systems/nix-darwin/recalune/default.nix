@@ -130,7 +130,6 @@
       # We prefer to use Tailscale nix-darwin modules, so we comment this out
       Tailscale = 1475387142;
       Bitwarden = 1352778147;
-      # WhatsAppWeb = 1147396723;
       WhatsAppMessenger = 310633997;
       SlackDesktop = 803453959;
       OneDrive = 823766827;

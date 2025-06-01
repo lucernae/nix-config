@@ -40,7 +40,7 @@ Build and switch to a NixOS configuration:
 
 ```bash
 # From the repository root
-nixos-rebuild switch --flake .#vmware
+NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch --impure --flake .#vmware
 ```
 
 Replace `vmware` with the name of your NixOS configuration.
@@ -51,7 +51,7 @@ Build and switch to a Darwin configuration:
 
 ```bash
 # From the repository root
-darwin-rebuild switch --flake .#recalune
+NIXPKGS_ALLOW_UNFREE=1 darwin-rebuild switch --flake .#recalune
 ```
 
 Replace `recalune` with the name of your Darwin configuration.
@@ -62,59 +62,10 @@ Apply a standalone Home Manager configuration:
 
 ```bash
 # From the home-manager directory
-home-manager switch --flake .#recalune
+NIXPKGS_ALLOW_UNFREE=1 home-manager switch --flake .#recalune
 ```
 
 Replace `recalune` with the name of your Home Manager configuration.
-
-## Testing Information
-
-### Testing Framework
-
-This repository uses a simple testing approach based on Nix derivations. Tests are located in the `.junie/tests` directory.
-
-### Running Tests
-
-To run all tests:
-
-```bash
-# From the repository root
-./.junie/tests/run-test.sh
-```
-
-### Adding New Tests
-
-1. Create a new Nix file in the `.junie/tests` directory
-2. Define a test derivation that evaluates the configuration or functionality you want to test
-3. Update the `run-test.sh` script to include your new test
-
-### Example Test
-
-Here's an example of a simple test that verifies a Nix expression can be evaluated:
-
-```nix
-{ pkgs ? import <nixpkgs> {} }:
-
-let
-  testExpr = {
-    name = "test-config";
-    description = "A simple test configuration";
-    # ... other attributes
-  };
-in
-{
-  # Return the test expression
-  inherit testExpr;
-
-  # A derivation that succeeds if the test expression can be evaluated
-  test = pkgs.runCommand "test-nix-config" {} ''
-    echo "Test expression evaluates successfully!"
-    echo "Name: ${testExpr.name}"
-    # ... other assertions
-    touch $out
-  '';
-}
-```
 
 ## Additional Development Information
 

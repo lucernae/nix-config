@@ -1,5 +1,6 @@
 { config, pkgs, home-manager, ... }:
 {
+  # see https://nix-darwin.github.io/nix-darwin/manual/index.html for full options of system.defaults for macOS
   system.defaults = {
     loginwindow = {
       GuestEnabled = false;
