@@ -1,8 +1,8 @@
 {
-  description = "A Python development shell with uv package manager";
+  description = "${context.description}";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-${context.nixpkgs-version}";
     devshell.url = "github:numtide/devshell";
     devshell.inputs.nixpkgs.follows = "nixpkgs";
     flake-utils.url = "github:numtide/flake-utils";
@@ -16,11 +16,11 @@
           overlays = [ devshell.overlays.default ];
         };
 
-        python = pkgs."python311";
+        python = pkgs."python${builtins.replaceStrings ["."] [""] context.python-version}";
       in
       {
         devShells.default = pkgs.devshell.mkShell {
-          name = "python-uv-devshell";
+          name = "${context.name}";
           packages = with pkgs; [
             # Python and uv
             python
@@ -39,8 +39,13 @@
             }
             {
               name = "install-deps";
-              help = "Install dependencies from requirements.txt using uv";
-              command = "uv pip install -r requirements.txt";
+              help = "Install dependencies from requirements.txt and pyproject.toml using uv";
+              command = "uv pip install -e .";
+            }
+            {
+              name = "run-mcp";
+              help = "Run the MCP server using uvx";
+              command = "uvx run";
             }
           ];
 

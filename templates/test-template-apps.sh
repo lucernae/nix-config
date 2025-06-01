@@ -27,10 +27,10 @@ test_template_app() {
     local target_dir="./metatemplates/generated/${app_name}"
 
     debug "Testing template app: ${app_name}"
-    
+
     # Generate the template
     nix run .#"${app_name}" -- --target "${target_dir}"
-    
+
     # Test the development environment
     if [ -d "${target_dir}" ]; then
         debug "Testing development environment for ${app_name}..."

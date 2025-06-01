@@ -15,7 +15,7 @@
           inherit system;
           overlays = [ devshell.overlays.default ];
         };
-        
+
         python = pkgs."python${builtins.replaceStrings ["."] [""] context.python-version}";
       in
       {
@@ -25,12 +25,12 @@
             # Python and uv
             python
             uv
-            
+
             # Additional useful tools
             git
             curl
           ];
-          
+
           commands = [
             {
               name = "setup-venv";
@@ -43,7 +43,7 @@
               command = "uv pip install -r requirements.txt";
             }
           ];
-          
+
           env = [
             {
               name = "PYTHONPATH";

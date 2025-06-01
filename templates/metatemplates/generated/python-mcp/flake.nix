@@ -1,5 +1,5 @@
 {
-  description = "A Python development shell with uv package manager";
+  description = "A Model Context Protocol (MCP) project with fastmcp";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -19,8 +19,15 @@
         python = pkgs."python311";
       in
       {
+        apps.default = {
+          type = "app";
+          program = toString (pkgs.writeShellScript "run-mcp" ''
+            ${pkgs.uv}/bin/uvx --from ${./.} mcp-server
+          '');
+        };
+
         devShells.default = pkgs.devshell.mkShell {
-          name = "python-uv-devshell";
+          name = "python-mcp";
           packages = with pkgs; [
             # Python and uv
             python
@@ -39,8 +46,13 @@
             }
             {
               name = "install-deps";
-              help = "Install dependencies from requirements.txt using uv";
-              command = "uv pip install -r requirements.txt";
+              help = "Install dependencies from requirements.txt and pyproject.toml using uv";
+              command = "uv pip install -e .";
+            }
+            {
+              name = "run-mcp";
+              help = "Run the MCP server using uv run";
+              command = "uv run mcp-server";
             }
           ];
 

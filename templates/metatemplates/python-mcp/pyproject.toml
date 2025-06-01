@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mcp-project"
+version = "0.1.0"
+description = "A Model Context Protocol (MCP) project"
+readme = "README.md"
+requires-python = ">=${context.python-version}"
+dependencies = [
+    "fastmcp",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "isort",
+    "mypy",
+    "pytest",
+]
+
+[tool.black]
+line-length = 88
+target-version = ["py${builtins.replaceStrings ["."] [""] context.python-version}"]
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+[tool.mypy]
+python_version = "${context.python-version}"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true

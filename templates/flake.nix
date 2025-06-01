@@ -24,6 +24,8 @@
             { name = "devshell"; description = "A simple development shell template"; }
             # python-uv template will be available after processing
             # { name = "python-uv"; description = "A Python development shell with uv package manager"; }
+            # python-mcp template will be available after processing
+            # { name = "python-mcp"; description = "A Model Context Protocol (MCP) project with fastmcp"; }
           ];
 
 
@@ -43,7 +45,7 @@
             };
 
           # List of template names
-          templateNames = [ "devshell" "python-uv" ];
+          templateNames = [ "devshell" "python-uv" "python-mcp" ];
 
           # Generate apps for each template
           templateApps = builtins.listToAttrs (map mkTemplateApp templateNames);

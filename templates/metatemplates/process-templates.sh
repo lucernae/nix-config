@@ -87,7 +87,7 @@ process_file() {
     local rel_path="${source_file#$SOURCE_DIR/}"
     local target_file="$TARGET_DIR/$rel_path"
     local target_dir="$(dirname "$target_file")"
-    
+
     # Create target directory if it doesn't exist
     mkdir -p "$target_dir"
 
@@ -95,7 +95,7 @@ process_file() {
     if [ "$rel_path" = "context.template.nix" ] && [[ -f $target_file ]]; then
         return 0
     fi
-    
+
     # Process the file content using nix-instantiate
     local content=$(cat "$source_file")
     nix-instantiate --eval --expr "
