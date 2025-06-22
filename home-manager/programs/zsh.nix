@@ -72,7 +72,7 @@
       hmb = "home-manager build";
       # nixos-rebuild
       nrs = "sudo nixos-rebuild switch";
-      nrsf = "NIXPKGS_ALLOW_UNFREE=1 sudo nixos-rebuild switch --impure --flake ~/.config/nix-config";
+      nrsf = "sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch --impure --flake ~/.config/nix-config";
       nrb = "nixos-rebuild build";
       # sshagent
       sagent = "sshagent_init";

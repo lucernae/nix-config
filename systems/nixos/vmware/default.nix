@@ -98,7 +98,7 @@
 
   # Enable the KDE Plasma Desktop Environment.
   services.displayManager.sddm.enable = true;
-  services.xserver.desktopManager.plasma5.enable = true;
+  services.xserver.desktopManager.plasma6.enable = true;
 
   # Configure keymap in X11
   services.xserver = {
@@ -111,7 +111,8 @@
 
   # Enable sound with pipewire.
   # sound.enable = true;
-  hardware.pulseaudio.enable = false;
+  # hardware.pulseaudio.enable = false;
+  services.pulseaudio.enable =false;
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -141,7 +142,7 @@
     extraGroups = [ "networkmanager" "wheel" "docker" "vmware" ];
     packages = with pkgs; [
       firefox
-      kate
+      kdePackages.kate
       #  thunderbird
     ];
   };
@@ -165,7 +166,7 @@
     # bitwarden
     tailscale
     open-vm-tools
-    libsForQt5.filelight
+    kdePackages.filelight
     vlc
     qemu
     spice-gtk
@@ -223,9 +224,11 @@
   virtualisation.docker.enable = true;
 
   fonts.fontDir.enable = true;
+
   fonts.packages = with pkgs; [
     jetbrains-mono
-    (nerdfonts.override { fonts = [ "FiraCode" "DroidSansMono" ]; })
+    nerd-fonts.fira-code
+    nerd-fonts.droid-sans-mono
   ];
 
   # `home-manager` config

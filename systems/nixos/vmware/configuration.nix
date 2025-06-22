@@ -87,7 +87,7 @@
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
       firefox
-      kate
+      kdePackages.kate
       #  thunderbird
     ];
   };

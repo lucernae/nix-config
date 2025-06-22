@@ -13,7 +13,7 @@
     act
     comma
     # bitwarden-cli # need to install from app
-    bws
+    # bws
     elan
   ] ++ [
     # programming languages related
@@ -32,7 +32,7 @@
       pinentry-box-cli
     ]
   )
-  ++ (lib.optionals stdenv.isLinux [ kgpg kwalletcli ]);
+  ++ (lib.optionals stdenv.isLinux [ kdePackages.kgpg kwalletcli ]);
 
   home.file.scripts = {
     enable = true;
