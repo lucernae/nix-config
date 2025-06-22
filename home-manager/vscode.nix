@@ -10,6 +10,7 @@
     ./programs/direnv.nix
     ./programs/git-vscode.nix
     ./programs/zsh.nix
+    ./programs/starship.nix
   ];
 
 }
