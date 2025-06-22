@@ -1,5 +1,7 @@
 {
-    "useFlake": "true",
-    "prebuildHomeManagerFlake": "./home-manager#vscode",
-    "imageVariant": "flake---latest"
+  "useFlake": "true",
+  "useDirenv": "true",
+  "prebuildFlakeDevelop": true,
+  "prebuildHomeManagerFlake": "./home-manager#vscode",
+  "imageVariant": "flake---latest"
 }
