@@ -25,6 +25,8 @@ with pkgs;
         "terminal.external.osxExec" = "/opt/homebrew/bin/ghostty";
         "terminal.explorerKind" = "external";
         "workbench.sideBar.location" = "right";
+        "editor.inlineSuggest.suppressSuggestions" = true;
+        "amazonQ.telemetry"= false;
       };
       extensions =
         # with (nix-vscode-extensions.forVSCodeVersion config.programs.vscode.package.version).vscode-marketplace;
@@ -38,6 +40,7 @@ with pkgs;
           ms-azuretools.vscode-docker
           ms-kubernetes-tools.vscode-kubernetes-tools
           # ms-vscode.makefile-tools
+          ms-vscode.extension-test-runner
           ms-vscode.remote-server
           ms-vscode-remote.remote-containers
           ms-vscode-remote.remote-ssh
@@ -57,10 +60,12 @@ with pkgs;
           garmin.monkey-c
           amazonwebservices.amazon-q-vscode
           sourcegraph.cody-ai
+          # jetbrains.jetbrains-ai-assistant
+          cucumberopen.cucumber-official
         ]
         # ++ (lib.optionals stdenv.isDarwin [ withfig.fig ])
       ;
     };
-    mutableExtensionsDir = false;
+    mutableExtensionsDir = true;
   };
 }
