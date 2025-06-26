@@ -11,6 +11,7 @@
     ./programs/git-vscode.nix
     ./programs/zsh.nix
     ./programs/starship.nix
+    ./programs/gemini-cli.nix
   ];
 
 }

@@ -15,6 +15,7 @@
     ./programs/vim.nix
     ./programs/starship.nix
     ./services/gpg-agent.nix
+    ./programs/gemini-cli.nix
   ];
 
   home.packages = with pkgs; [

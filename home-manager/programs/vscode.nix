@@ -26,7 +26,7 @@ with pkgs;
         "terminal.explorerKind" = "external";
         "workbench.sideBar.location" = "right";
         "editor.inlineSuggest.suppressSuggestions" = true;
-        "amazonQ.telemetry"= false;
+        "amazonQ.telemetry" = false;
       };
       extensions =
         # with (nix-vscode-extensions.forVSCodeVersion config.programs.vscode.package.version).vscode-marketplace;
