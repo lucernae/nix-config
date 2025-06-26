@@ -1,48 +1,58 @@
-{ stdenv, fetchurl, makeWrapper, nodejs, cacert, lib, ... }:
-let
-  gemini-cli = stdenv.mkDerivation rec {
-    pname = "gemini-cli";
-    version = "0.1.3";
+{ lib, buildNpmPackage, importNpmLock, cacert, fetchFromGitHub, nodejs, makeWrapper }:
 
-    src = fetchurl {
-      url = "https://registry.npmjs.org/@google/gemini-cli/-/gemini-cli-0.1.3.tgz";
-      sha256 = "sha256-wS21HhdunxsPXDKd91ltEJnpGTxEwu9vPFs5wPVooYQ=";
-    };
+buildNpmPackage rec {
+  pname = "gemini-cli";
+  version = "0.1.5";
 
-    nativeBuildInputs = [ makeWrapper ];
-
-    env = {
-      NPM_CONFIG_PROGRESS = "false"; # Disable progress bar
-      NPM_CONFIG_FUND = "false"; # Disable funding message
-      NPM_CONFIG_AUDIT = "false"; # Disable audit
-      NPM_CONFIG_UPDATE_NOTIFIER = "false"; # Disable update notifications
-      CI = "true"; # Run in CI mode
-      SSL_CERT_FILE = "${cacert}/etc/ssl/certs/ca-bundle.crt"; # Add SSL cert path
-      SYSTEM_CERTIFICATE_PATH = "${cacert}/etc/ssl/certs/ca-bundle.crt"; # Additional cert path
-    };
-
-
-    buildPhase = ''
-      export HOME=$TMPDIR  # Set home directory for npm cache
-      export npm_config_cafile=${cacert}/etc/ssl/certs/ca-bundle.crt
-      export PATH="${nodejs}/bin:$PATH"
-      echo "install node_modules"
-      ${nodejs}/bin/npm install --no-progress --no-audit --loglevel info
-    '';
-
-    installPhase = ''
-      mkdir -p $out/bin
-      cp -r . $out/
-      makeWrapper ${nodejs}/bin/node $out/bin/gemini --add-flags $out/dist/index.js
-    '';
-
-    meta = with lib; {
-      description = "Google Gemini CLI";
-      homepage = "https://github.com/google-gemini/gemini-cli";
-      license = licenses.asl20;
-      maintainers = with maintainers; [ ];
-      platforms = platforms.all;
-    };
+  src = fetchFromGitHub {
+    owner = "google-gemini";
+    repo = "gemini-cli";
+    rev = "01ff27709d7b62491bc2438fb8939da034c1c003";
+    sha256 = "sha256-JgiK+8CtMrH5i4ohe+ipyYKogQCmUv5HTZgoKRNdnak=";
   };
-in
-gemini-cli
+
+  npmDepsHash = "sha256-yoUAOo8OwUWG0gyI5AdwfRFzSZvSCd3HYzzpJRvdbiM=";
+
+  # Ensure makeWrapper is available during build
+  nativeBuildInputs = [ makeWrapper ];
+
+  npmFlags = [
+    "--no-audit"
+    "--no-fund"
+    "--loglevel=verbose"
+  ];
+
+  # Environment variables to help with DNS resolution
+  env = {
+    CI = "true"; # Run in CI mode
+    SSL_CERT_FILE = "${cacert}/etc/ssl/certs/ca-bundle.crt"; # Add SSL cert path
+    SYSTEM_CERTIFICATE_PATH = "${cacert}/etc/ssl/certs/ca-bundle.crt"; # Additional cert path
+  };
+
+  # Allow binary substitutes if available
+  allowSubstitutes = true;
+
+  # Create a wrapper script to run the CLI
+  # When building from GitHub source, the path structure might be different
+  postInstall = ''
+    mkdir -p $out/bin
+    # remove unused symlinks to avoid noBrokenSymlinks
+
+    pushd $out/lib/node_modules/@google/gemini-cli/node_modules
+    rm ./.bin/gemini
+    rm -f @google/gemini-cli
+    rm -f @google/gemini-cli-core
+
+    makeWrapper ${nodejs}/bin/node $out/bin/gemini \
+        --add-flags $out/lib/node_modules/@google/gemini-cli/bundle/gemini.js \
+        --prefix PATH : ${lib.makeBinPath [ nodejs ]}
+  '';
+
+  meta = with lib; {
+    description = "Google Gemini CLI";
+    homepage = "https://github.com/google-gemini/gemini-cli";
+    license = licenses.asl20;
+    maintainers = with maintainers; [ ];
+    platforms = platforms.all;
+  };
+}

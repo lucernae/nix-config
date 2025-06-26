@@ -73,6 +73,19 @@
           };
         in
         rec {
+          nixConfig = {
+            sandbox = false;
+            extra-sandbox-paths = [ "/etc/resolv.conf" ];
+            # Additional DNS configuration to help with EAI_AGAIN errors
+            bash-prompt = "\[\\e[1;32m\][\[\\e[1;37m\]nix-develop\[\\e[1;32m\]:\\w]\\$\[\\e[0m\] ";
+            connect-timeout = 60;
+            http-connections = 100;
+            fallback = true;
+            # Use specific DNS servers
+            substituters = [
+              "https://cache.nixos.org?dns=1.1.1.1,8.8.8.8,8.8.4.4"
+            ];
+          };
           formatter = nixpkgs.legacyPackages.${system}.nixpkgs-fmt;
 
           # The homeConfigurations are now packages.
