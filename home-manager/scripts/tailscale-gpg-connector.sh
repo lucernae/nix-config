@@ -31,7 +31,7 @@ rm -f "${CODESPACE_GPG_SOCKET}"
 # reuseaddr: allows immediate reuse of the address
 # bind: binds to a specific address (optional, but good practice)
 # echo "Starting GPG agent connector..."
-${pkgs.socat}/bin/socat \
+socat \
   UNIX-LISTEN:"${CODESPACE_GPG_SOCKET}",fork,unlink-early,reuseaddr \
   TCP:"${LAPTOP_TAILSCALE_NAME}":"${SOCAT_PORT}" &
 
@@ -40,4 +40,3 @@ export GPG_TTY=$(tty)
 
 # Inform the user (optional, can be removed for cleaner output)
 # echo "GPG agent connector started. GPG_TTY set."
-

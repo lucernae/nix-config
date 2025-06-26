@@ -49,7 +49,7 @@
   home.file.".npmrc" = {
     enable = true;
     text = ''
-      prefix=$HOME/.npm-global
+      prefix=${config.home.homeDirectory}/.npm-global
     '';
     target = ".npmrc";
   };

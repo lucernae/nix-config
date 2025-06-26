@@ -36,9 +36,9 @@
         # Sourcing custom scripts
         source ~/.scripts/zsh/*.sh
 
-        # Run GPG connector script for Codespaces
-        if [[ -n "$CODESPACES" ]]; then
-          ~/.scripts/zsh/gpg-connector.sh
+        # Run Tailscale GPG connector script for Codespaces
+        if [[ -n "$CODESPACES" ]] && [[ ~/.scripts/tailscale-gpg-connector.sh ]]; then
+          ~/.scripts/tailscale-gpg-connector.sh
         fi
 
         # Amazon Q post block. Keep at the bottom of this file.

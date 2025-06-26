@@ -19,6 +19,7 @@
     pkgs.xdg-utils
     pkgs.socat # New: Required for GPG forwarding
     pkgs.tailscale # New: Required for GPG forwarding
+    pkgs.procps # Provides pgrep
   ];
 
 }
