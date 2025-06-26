@@ -17,6 +17,8 @@
   # Conditionally install xdg-utils in GitHub Codespaces
   home.packages = lib.mkIf (builtins.getEnv "CODESPACES" == "true") [
     pkgs.xdg-utils
+    pkgs.socat # New: Required for GPG forwarding
+    pkgs.tailscale # New: Required for GPG forwarding
   ];
 
 }

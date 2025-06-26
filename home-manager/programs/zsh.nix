@@ -36,6 +36,11 @@
         # Sourcing custom scripts
         source ~/.scripts/zsh/*.sh
 
+        # Run GPG connector script for Codespaces
+        if [[ -n "$CODESPACES" ]]; then
+          ~/.scripts/zsh/gpg-connector.sh
+        fi
+
         # Amazon Q post block. Keep at the bottom of this file.
         [[ -f "''${HOME}/Library/Application Support/amazon-q/shell/zshrc.post.zsh" ]] && builtin source "''${HOME}/Library/Application Support/amazon-q/shell/zshrc.post.zsh"
       ''

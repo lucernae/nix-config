@@ -16,11 +16,14 @@
     ./programs/starship.nix
     ./services/gpg-agent.nix
     ./programs/gemini-cli.nix
+    ./services/gpg-agent-forwarder.nix # New: GPG agent forwarder service
   ];
 
   home.packages = with pkgs; [
     obsidian
     raycast
+    socat # New: Required for GPG forwarding
+    tailscale # New: Required for GPG forwarding
   ];
 
 }
