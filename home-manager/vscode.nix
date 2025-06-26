@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 {
   # Home Manager needs a bit of information about you and the
   # paths it should manage.
@@ -12,6 +12,11 @@
     ./programs/zsh.nix
     ./programs/starship.nix
     ./programs/gemini-cli.nix
+  ];
+
+  # Conditionally install xdg-utils in GitHub Codespaces
+  home.packages = lib.mkIf (builtins.getEnv "CODESPACES" == "true") [
+    pkgs.xdg-utils
   ];
 
 }

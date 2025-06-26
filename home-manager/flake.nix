@@ -60,56 +60,44 @@
               })
             ];
           };
-          # Define the recalune home configuration once to reuse it.
-          recaluneHomeConfig = home-manager.lib.homeManagerConfiguration {
-            inherit pkgs;
-            modules = [
-              { nixpkgs = nixpkgsConfig; }
-              ./recalune.nix
-            ];
-            extraSpecialArgs = {
-              inherit (devenv.packages.${system}) devenv;
+          homeConfigurations = {
+            recalune = home-manager.lib.homeManagerConfiguration {
+              inherit pkgs;
+              modules = [
+                { nixpkgs = nixpkgsConfig; }
+                ./recalune.nix
+              ];
+              extraSpecialArgs = {
+                inherit (devenv.packages.${system}) devenv;
+              };
+            };
+            vscode = home-manager.lib.homeManagerConfiguration {
+              inherit pkgs;
+              modules = [
+                { nixpkgs = nixpkgsConfig; }
+                ./vscode.nix
+              ];
+              extraSpecialArgs = {
+                inherit (devenv.packages.${system}) devenv;
+              };
+            };
+            vmware = home-manager.lib.homeManagerConfiguration {
+              inherit pkgs;
+              modules = [
+                { nixpkgs = nixpkgsConfig; }
+                ./vmware.nix
+              ];
+              extraSpecialArgs = {
+                inherit (devenv.packages.${system}) devenv;
+              };
             };
           };
         in
         rec {
-          nixConfig = {
-            sandbox = false;
-            extra-sandbox-paths = [ "/etc/resolv.conf" ];
-            # Additional DNS configuration to help with EAI_AGAIN errors
-            bash-prompt = "\[\\e[1;32m\][\[\\e[1;37m\]nix-develop\[\\e[1;32m\]:\\w]\\$\[\\e[0m\] ";
-            connect-timeout = 60;
-            http-connections = 100;
-            fallback = true;
-            # Use specific DNS servers
-            substituters = [
-              "https://cache.nixos.org?dns=1.1.1.1,8.8.8.8,8.8.4.4"
-            ];
-          };
           formatter = nixpkgs.legacyPackages.${system}.nixpkgs-fmt;
 
           # The homeConfigurations are now packages.
-          packages.homeConfigurations.recalune = recaluneHomeConfig;
-          packages.homeConfigurations.vscode = home-manager.lib.homeManagerConfiguration {
-            inherit pkgs;
-            modules = [
-              { nixpkgs = nixpkgsConfig; }
-              ./vscode.nix
-            ];
-            extraSpecialArgs = {
-              inherit (devenv.packages.${system}) devenv;
-            };
-          };
-          packages.homeConfigurations.vmware = home-manager.lib.homeManagerConfiguration {
-            inherit pkgs;
-            modules = [
-              { nixpkgs = nixpkgsConfig; }
-              ./vmware.nix
-            ];
-            extraSpecialArgs = {
-              inherit (devenv.packages.${system}) devenv;
-            };
-          };
+          packages.homeConfigurations = homeConfigurations;
           packages.gemini-cli =
             let
               gemini-cli = pkgs.callPackage ./packages/gemini-cli { };
@@ -130,33 +118,49 @@
                 (p: !(pkgs.lib.strings.hasInfix "-home-manager-generation" p))
                 currentPathList;
 
+              # Get the current username to select the correct home configuration.
+              username = builtins.getEnv "USER";
+              # Default to 'recalune' if the user is not in the map.
+              activeConfigName = if builtins.hasAttr username homeConfigurations then username else "recalune";
+              activeHomeConfig = homeConfigurations.${activeConfigName};
+
               # Construct the new, clean PATH.
               # 1. Prepend the new home-manager profile's bin directory.
               # 2. Add the filtered list of existing paths.
               # 3. Ensure the final list has no duplicates.
               # 4. Join the list back into a PATH string.
               devPath = pkgs.lib.strings.concatStringsSep ":" (pkgs.lib.lists.unique ([
-                "${recaluneHomeConfig.activationPackage}/bin"
+                "${activeHomeConfig.activationPackage}/bin"
               ] ++ filteredPathList));
             in
             pkgs.mkShell {
               name = "home-manager-shell";
 
               inputsFrom = [
-                recaluneHomeConfig.activationPackage
+                activeHomeConfig.activationPackage
               ];
 
               buildInputs = [
                 home-manager.packages.${system}.home-manager
                 pkgs.zsh
               ];
+              env = {
+                NIXPKGS_ALLOW_UNFREE = 1;
+              };
 
               # The shellHook now simply exports the PATH we constructed in the 'let' block.
               shellHook = ''
                 export PATH="${devPath}"
-                echo "Entered home-manager development shell."
-                echo "The 'home-manager' command and all packages from the 'recalune' configuration are available."
-                echo "You can now run 'hmsf' or 'home-manager switch --flake .#recalune'"
+                echo "Entered home-manager development shell for user: ${username}"
+                echo "Using configuration for '${activeConfigName}'."
+                echo "The 'home-manager' command and all packages from the '${activeConfigName}' configuration are available."
+                echo "You can now run 'hmsf' or 'home-manager switch --flake .#${activeConfigName}'"
+
+                # If we are in an interactive shell, switch to zsh
+                if [[ -n "$PS1" && -z "$INSIDE_NIX_SHELL_ZSH" ]]; then
+                  export INSIDE_NIX_SHELL_ZSH=1
+                  exec ${pkgs.zsh}/bin/zsh
+                fi
               '';
             };
         }
