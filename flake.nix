@@ -103,7 +103,8 @@
                 })
               )
               (final: prev: {
-                gemini-cli = final.callPackage ./home-manager/packages/gemini-cli { };
+                unstable = import nixpkgs-unstable { system = prev.system; };
+                # gemini-cli = final.callPackage ./home-manager/packages/gemini-cli { };
                 nix-vscode-extensions = nix-vscode-extensions.extensions.${system};
                 pinentry-box = pinentry-box.packages.${system}.pinentry_box;
                 pinentry-box-cli = pinentry-box.packages.${system}.pinentry_box_cli;

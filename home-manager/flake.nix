@@ -3,9 +3,9 @@
 
   inputs = {
     # Specify the source of Home Manager and Nixpkgs.
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     home-manager = {
-      url = "github:nix-community/home-manager/release-25.11";
+      url = "github:nix-community/home-manager/release-25.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Flake utils
@@ -16,6 +16,7 @@
     nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
     # Pinentry-Box
     pinentry-box.url = "github:lucernae/pinentry-box?dir=pinentry-box";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
   };
 
   outputs =
@@ -26,6 +27,7 @@
     , devenv
     , nix-vscode-extensions
     , pinentry-box
+    , nixpkgs-unstable
     , ...
     }:
     let
@@ -45,6 +47,7 @@
               allowUnfree = true;
               allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) [
                 "vscode-extension-github-codespaces"
+                "gemini-cli"
               ];
             };
           };
@@ -53,10 +56,11 @@
             inherit (nixpkgsConfig) config;
             overlays = [
               (final: prev: {
+                unstable = import nixpkgs-unstable { system = prev.system; };
                 nix-vscode-extensions = nix-vscode-extensions.extensions.${system};
                 pinentry-box = pinentry-box.packages.${system}.pinentry_box;
                 pinentry-box-cli = pinentry-box.packages.${system}.pinentry_box_cli;
-                gemini-cli = final.callPackage ./packages/gemini-cli { };
+                # gemini-cli = final.callPackage ./packages/gemini-cli { };
               })
             ];
           };
@@ -98,11 +102,11 @@
 
           # The homeConfigurations are now packages.
           packages.homeConfigurations = homeConfigurations;
-          packages.gemini-cli =
-            let
-              gemini-cli = pkgs.callPackage ./packages/gemini-cli { };
-            in
-            gemini-cli;
+          # packages.gemini-cli =
+          #   let
+          #     gemini-cli = pkgs.callPackage ./packages/gemini-cli { };
+          #   in
+          #   gemini-cli;
 
           # Add the devShell for the recalune configuration.
           devShells.default =

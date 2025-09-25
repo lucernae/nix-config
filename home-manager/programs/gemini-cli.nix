@@ -1,7 +1,6 @@
 { config, pkgs, ... }:
 {
   home.packages = [
-    # from the overlay for now
-    pkgs.gemini-cli
+    pkgs.unstable.gemini-cli
   ];
 }

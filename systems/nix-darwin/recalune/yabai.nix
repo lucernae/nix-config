@@ -21,9 +21,20 @@
       yabai -m rule --add app="^Raycast" manage=off
       yabai -m rule --add app="^Finder" manage=off
       yabai -m rule --add app="^Activity Monitor" manage=off
+      yabai -m rule --add app="^Bitwarden" manage=off
       yabai -m signal --add app='^Ghostty$' event=window_created action='yabai -m space --layout bsp'
       yabai -m signal --add app='^Ghostty$' event=window_destroyed action='yabai -m space --layout bsp'
-      yabai -m signal --add event=display_added action="yabai -m space --focus recent; yabai -m space --focus prev"
+
+      handle_display_change() {
+        # Focus recent space
+        yabai -m space --focus recent
+        # Focus previous space
+        yabai -m space --focus prev
+      }
+
+      yabai -m rule --add signal=display_added action="handle_display_change"
+      yabai -m rule --add signal=display_removed action="handle_display_change"
+      yabai -m rule --add signal=display_moved action="handle_display_change"
     '';
   };
 }

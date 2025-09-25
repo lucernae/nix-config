@@ -29,6 +29,10 @@
         # Set PATH for Rancher Desktop
         export PATH="$HOME/.rd/bin:$PATH"
 
+        # NPM global packages
+        export NPM_CONFIG_PREFIX="$HOME/.npm-global"
+        export PATH="$HOME/.npm-global/bin:$PATH"
+
         # GPG
         export GPG_TTY=$(tty)
         gpgconf --launch gpg-agent
@@ -98,7 +102,7 @@
         # macos specific
         # darwin-rebuild
         drs = "darwin-rebuild switch";
-        drsf = "NIXPKGS_ALLOW_UNFREE=1 darwin-rebuild switch --impure --flake ~/.config/nix-config";
+        drsf = "sudo NIXPKGS_ALLOW_UNFREE=1 darwin-rebuild switch --impure --flake ~/.config/nix-config";
         drb = "darwin-rebuild build";
 
         # launchctl

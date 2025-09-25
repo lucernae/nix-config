@@ -129,24 +129,26 @@
       # sunshine is still experimental in macos
       # "sunshine"
     ];
-    masApps = {
-      # App URL format
-      # https://apps.apple.com/id/app/line/id539883307?mt=12
-      Xcode = 497799835;
-      # We prefer to use Tailscale nix-darwin modules, so we comment this out
-      Tailscale = 1475387142;
-      Bitwarden = 1352778147;
-      WhatsAppMessenger = 310633997;
-      SlackDesktop = 803453959;
-      OneDrive = 823766827;
-      Line = 539883307;
-    };
+    # There is a bug that repeatedly reinstalls mas apps on each activation.
+    # So we comment this out for now.
+    # masApps = {
+    #   # App URL format
+    #   # https://apps.apple.com/id/app/line/id539883307?mt=12
+    #   Xcode = 497799835;
+    #   # We prefer to use Tailscale nix-darwin modules, so we comment this out
+    #   Tailscale = 1475387142;
+    #   Bitwarden = 1352778147;
+    #   WhatsAppMessenger = 310633997;
+    #   SlackDesktop = 803453959;
+    #   OneDrive = 823766827;
+    #   Line = 539883307;
+    # };
     casks = [
       "notion-calendar"
       "signal"
       "discord"
       # "visual-studio-code" maintained by home-manager
-      "docker"
+      "docker-desktop"
       "firefox"
       "microsoft-edge"
       "diffmerge"
