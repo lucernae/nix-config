@@ -179,6 +179,8 @@
   # home-manager.useUserPackages = true;
   # home-manager.users.recalune = import ./home.nix;
 
+  system.primaryUser = "recalune";
+
   system.activationScripts.fixZshPermissions = pkgs.runCommand ''
     compaudit | xargs sudo chown root:admin
   '';

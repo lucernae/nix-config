@@ -19,8 +19,11 @@
     extraConfig = ''
       yabai -m rule --add app="^System Settings" manage=off
       yabai -m rule --add app="^Raycast" manage=off
+      yabai -m rule --add app="^Finder" manage=off
+      yabai -m rule --add app="^Activity Monitor" manage=off
       yabai -m signal --add app='^Ghostty$' event=window_created action='yabai -m space --layout bsp'
       yabai -m signal --add app='^Ghostty$' event=window_destroyed action='yabai -m space --layout bsp'
+      yabai -m signal --add event=display_added action="yabai -m space --focus recent; yabai -m space --focus prev"
     '';
   };
 }

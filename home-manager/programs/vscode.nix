@@ -4,7 +4,7 @@ let
 in
 with pkgs;
 {
-  # https://github.com/nix-community/home-manager/blob/master/modules/programs/vscode.nix
+  # https://github.com/nix-community/home-manager/blob/master/modules/programs/vscode/default.nix
   # https://github.com/nix-community/nix-vscode-extensions
   programs.vscode = {
     enable = trace-enable;
@@ -20,8 +20,12 @@ with pkgs;
         "terminal.integrated.defaultProfile.osx" = "zsh";
         "terminal.integrated.defaultProfile.linux" = "zsh";
         "terminal.integrated.enableMultiLinePasteWarning" = false;
-        "terminal.integrated.env.linux" = { };
-        "terminal.integrated.env.osx" = { };
+        "terminal.integrated.env.linux" = { 
+          "Q_NEW_SESSION" = "1";
+        };
+        "terminal.integrated.env.osx" = { 
+          "Q_NEW_SESSION" = "1";
+        };
         "terminal.external.osxExec" = "/opt/homebrew/bin/ghostty";
         "terminal.explorerKind" = "external";
         "workbench.sideBar.location" = "right";

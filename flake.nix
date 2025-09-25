@@ -37,14 +37,6 @@
       url = "github:homebrew/homebrew-cask";
       flake = false;
     };
-    homebrew-cask-drivers = {
-      url = "github:homebrew/homebrew-cask-drivers";
-      flake = false;
-    };
-    homebrew-cask-fonts = {
-      url = "github:homebrew/homebrew-cask-fonts";
-      flake = false;
-    };
     homebrew-apple = {
       url = "github:apple/homebrew-apple";
       flake = false;
@@ -74,8 +66,6 @@
     , homebrew-core
     , homebrew-bundle
     , homebrew-cask
-    , homebrew-cask-drivers
-    , homebrew-cask-fonts
     , homebrew-apple
     , homebrew-lizardbyte
     , homebrew-zeek
@@ -113,6 +103,7 @@
                 })
               )
               (final: prev: {
+                gemini-cli = final.callPackage ./home-manager/packages/gemini-cli { };
                 nix-vscode-extensions = nix-vscode-extensions.extensions.${system};
                 pinentry-box = pinentry-box.packages.${system}.pinentry_box;
                 pinentry-box-cli = pinentry-box.packages.${system}.pinentry_box_cli;
@@ -169,8 +160,6 @@
                             "homebrew/homebrew-core" = homebrew-core;
                             "homebrew/homebrew-bundle" = homebrew-bundle;
                             "homebrew/homebrew-cask" = homebrew-cask;
-                            "homebrew/homebrew-cask-drivers" = homebrew-cask-drivers;
-                            "homebrew/homebrew-cask-fonts" = homebrew-cask-fonts;
                             "apple/homebrew-apple" = homebrew-apple;
                             "zeek/homebrew-zeek" = homebrew-zeek;
                             "LizardByte/homebrew-homebrew" = homebrew-lizardbyte;

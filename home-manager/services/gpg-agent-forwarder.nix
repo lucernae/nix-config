@@ -9,7 +9,8 @@ let
     set -e
 
     # Find Tailscale IP, exit if not available
-    TS_IP=$(${pkgs.tailscale}/bin/tailscale ip -4)
+    TAILSCALE_BIN=${if pkgs.stdenv.isDarwin then "/Applications/Tailscale.app/Contents/MacOS/Tailscale" else "${pkgs.tailscale}/bin/tailscale"}
+    TS_IP=$($TAILSCALE_BIN ip -4)
     if [ -z "$TS_IP" ]; then
       echo "Tailscale IP not found. Is Tailscale running?"
       exit 1
@@ -29,9 +30,9 @@ in
 {
   # This service is for macOS (darwin)
   launchd.agents.gpg-agent-forwarder = lib.mkIf pkgs.stdenv.isDarwin {
-    enable = true;
+    enable = false;
     config = {
-      Label = "com.user.gpg-agent-forwarder";
+      Label = "id.maulana.gpg-agent-forwarder";
       Program = "${gpg-forwarder-script}/bin/gpg-agent-forwarder";
       RunAtLoad = true;
       KeepAlive = true;

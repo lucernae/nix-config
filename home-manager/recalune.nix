@@ -23,7 +23,7 @@
     obsidian
     raycast
     socat # New: Required for GPG forwarding
-    tailscale # New: Required for GPG forwarding
+    # tailscale # Tailscale package provided by nix homebrew
   ];
 
 }
