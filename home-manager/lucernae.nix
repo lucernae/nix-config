@@ -15,6 +15,7 @@
     ./programs/vim.nix
     ./programs/starship.nix
     ./programs/claude-code.nix
+    ./programs/vicinae.nix
     ./services/gpg-agent.nix
   ];
 
@@ -23,6 +24,8 @@
     kubectl
     ghostty
     jetbrains-toolbox
+    bottles
+    pcsx2
   ];
 
   home.sessionPath = [

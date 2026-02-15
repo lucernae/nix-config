@@ -280,6 +280,30 @@
                       ./systems/nixos/raspi/configuration.nix
                     ];
                   };
+
+                  # General purpose VM configuration
+                  # to build VM: nixos-rebuild build-vm --flake .#vm
+                  vm = nixosSystem {
+                    inherit system;
+                    modules = attrValues self.nixosModules ++ [
+                      # nixos config
+                      ./systems/nixos/vm
+                      # home-manager
+                      home-manager.nixosModules.home-manager
+                      {
+                        nixpkgs = nixpkgsConfig;
+                        # `home-manager` config
+                        home-manager.useGlobalPkgs = true;
+                        home-manager.useUserPackages = true;
+                        home-manager.users.vmuser = import ./home-manager/vmuser.nix;
+
+                        # pass to home configuration
+                        home-manager.extraSpecialArgs = {
+                          inherit (devenv.packages.${system}) devenv;
+                        };
+                      }
+                    ];
+                  };
                 } else { };
             };
 

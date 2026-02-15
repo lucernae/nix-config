@@ -17,6 +17,12 @@
     # Pinentry-Box
     pinentry-box.url = "github:lucernae/pinentry-box?dir=pinentry-box";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    # Vicinae
+    vicinae.url = "github:vicinaehq/vicinae";
+    vicinae-extensions = {
+      url = "github:vicinaehq/extensions";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -28,6 +34,8 @@
     , nix-vscode-extensions
     , pinentry-box
     , nixpkgs-unstable
+    , vicinae
+    , vicinae-extensions
     , ...
     }:
     let
@@ -99,10 +107,12 @@
               inherit pkgs;
               modules = [
                 { nixpkgs = nixpkgsConfig; }
+                vicinae.homeManagerModules.default
                 ./lucernae.nix
               ];
               extraSpecialArgs = {
                 inherit (devenv.packages.${system}) devenv;
+                inherit vicinae-extensions;
               };
             };
           };

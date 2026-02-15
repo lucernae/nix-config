@@ -2,6 +2,8 @@
 {
   imports = lib.optionals (builtins.pathExists ./hardware-configuration.nix) [
     ./hardware-configuration.nix
+  ] ++ [
+    ./gaming.nix
   ];
 
   nix = {
@@ -128,6 +130,7 @@
     pinentry-qt
     kdePackages.kwallet-pam
     kdePackages.ksshaskpass
+    fastfetch
   ];
 
   # Enable GnuPG agent with SSH support
