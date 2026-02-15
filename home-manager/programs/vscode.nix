@@ -21,6 +21,7 @@ let
     "editor.inlineSuggest.suppressSuggestions" = true;
     "claudeCode.preferredLocation" = "panel";
     "claudeCode.selectedModel" = "sonnet";
+    "claudeCode.claudeProcessWrapper" = "/home/lucernae/.nix-profile/bin/claude";
   };
 
   # Allow users to override workspace settings via config

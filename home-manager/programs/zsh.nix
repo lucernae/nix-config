@@ -29,9 +29,21 @@
         export NPM_CONFIG_PREFIX="$HOME/.npm-global"
         export PATH="$HOME/.npm-global/bin:$PATH"
 
-        # GPG
-        export GPG_TTY=$(tty)
+        # DBus session - required for KWallet integration
+        export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u)/bus"
+
+        # SSH askpass - use ksshaskpass for KWallet integration with SSH keys
+        export SSH_ASKPASS="/run/current-system/sw/bin/ksshaskpass"
+        export SSH_ASKPASS_REQUIRE=prefer
+
+        # GPG and SSH Agent via gpg-agent
+        # Note: GPG_TTY is NOT set to allow graphical pinentry (KWallet) to work
+        # If you need terminal-based pinentry, uncomment the line below:
+        # export GPG_TTY=$(tty)
         gpgconf --launch gpg-agent
+
+        # Set SSH_AUTH_SOCK to use gpg-agent (enables KWallet integration)
+        export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
 
         # Sourcing custom scripts
         source ~/.scripts/zsh/*.sh

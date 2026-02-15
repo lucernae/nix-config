@@ -125,13 +125,16 @@
     tailscale
     vlc
     kwalletcli
+    pinentry-qt
+    kdePackages.kwallet-pam
+    kdePackages.ksshaskpass
   ];
 
-  # Enable GnuPG agent
+  # Enable GnuPG agent with SSH support
+  # This allows gpg-agent to act as ssh-agent and use KWallet for password prompts
   programs.gnupg.agent = {
     enable = true;
     enableSSHSupport = true;
-    pinentryPackage = pkgs.pinentry-qt;
   };
 
   programs.zsh.enable = true;
