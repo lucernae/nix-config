@@ -23,11 +23,12 @@ with pkgs;
   #    pinentry-program ${pkgs.pinentry-box}/bin/pinentry-box
   #  '');
 
-  services.gpg-agent = {
-    enable = false;
-    # enable = stdenv.isLinux;
-    enableZshIntegration = true;
-    pinentry.package = pkgs.pinentry-qt;
-    # pinentry-qt should integrate with KWallet automatically on KDE Plasma
-  };
+  ## commented out because we uses systems level integration
+  # services.gpg-agent = {
+  #   enable = false;
+  #   # enable = stdenv.isLinux;
+  #   enableZshIntegration = true;
+  #   pinentry.package = pkgs.pinentry-qt;
+  #   # pinentry-qt should integrate with KWallet automatically on KDE Plasma
+  # };
 }
