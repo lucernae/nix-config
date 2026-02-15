@@ -2,15 +2,11 @@
 {
   programs.zsh = {
     enable = true;
-    dotDir = ".nix-zsh";
+    dotDir = "${config.home.homeDirectory}/.nix-zsh";
     completionInit = ''
       autoload -Uz compinit && compinit -i
     '';
     initContent = lib.mkMerge [
-      (lib.mkBefore ''
-        # Amazon Q pre block. Keep at the top of this file.
-        [[ -f "''${HOME}/Library/Application Support/amazon-q/shell/zshrc.pre.zsh" ]] && builtin source "''${HOME}/Library/Application Support/amazon-q/shell/zshrc.pre.zsh"
-      '')
       (lib.mkOrder 550 ''
         ZSH_DISABLE_COMPFIX=true
       '')
@@ -44,9 +40,6 @@
         if [[ -n "$CODESPACES" ]] && [[ ~/.scripts/tailscale-gpg-connector.sh ]]; then
           ~/.scripts/tailscale-gpg-connector.sh
         fi
-
-        # Amazon Q post block. Keep at the bottom of this file.
-        [[ -f "''${HOME}/Library/Application Support/amazon-q/shell/zshrc.post.zsh" ]] && builtin source "''${HOME}/Library/Application Support/amazon-q/shell/zshrc.post.zsh"
       ''
     ];
     oh-my-zsh = {
@@ -77,11 +70,11 @@
       # home-manager
       hm = "home-manager";
       hms = "home-manager switch";
-      hmsf = "NIXPKGS_ALLOW_UNFREE=1 home-manager switch --impure --flake ~/.config/nix-config/home-manager#$(whoami)";
+      hmsf = "NIXPKGS_ALLOW_UNFREE=1 NIXPKGS_ALLOW_INSECURE=1 home-manager switch --impure --flake ~/.config/nix-config/home-manager#$(whoami)";
       hmb = "home-manager build";
       # nixos-rebuild
       nrs = "sudo nixos-rebuild switch";
-      nrsf = "sudo NIXPKGS_ALLOW_UNFREE=1 nixos-rebuild switch --impure --flake ~/.config/nix-config";
+      nrsf = "sudo NIXPKGS_ALLOW_UNFREE=1 NIXPKGS_ALLOW_INSECURE=1 nixos-rebuild switch --impure --flake ~/.config/nix-config";
       nrb = "nixos-rebuild build";
       # sshagent
       sagent = "sshagent_init";

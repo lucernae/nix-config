@@ -3,15 +3,15 @@
 
   inputs = {
     # for nixpkgs
-    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.05";
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-25.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     # for mac setup using nix-darwin
     darwin.url = "github:lnl7/nix-darwin/master";
     darwin.inputs.nixpkgs.follows = "nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
     # home manager
-    home-manager.url = "github:nix-community/home-manager/release-25.05";
+    home-manager.url = "github:nix-community/home-manager/release-25.11";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     # devenv
     devenv.url = "github:cachix/devenv/latest";
@@ -91,6 +91,7 @@
               allowUnfree = true;
               allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) [
                 "vscode-extension-github-codespaces"
+                "vscode-extension-anthropic-claude-code"
               ];
               allowUnsupportedSystem = true;
             };
@@ -103,7 +104,7 @@
                 })
               )
               (final: prev: {
-                unstable = import nixpkgs-unstable { system = prev.system; };
+                unstable = import nixpkgs-unstable { system = prev.stdenv.hostPlatform.system; };
                 # gemini-cli = final.callPackage ./home-manager/packages/gemini-cli { };
                 nix-vscode-extensions = nix-vscode-extensions.extensions.${system};
                 pinentry-box = pinentry-box.packages.${system}.pinentry_box;
@@ -244,6 +245,30 @@
                       }
                       # tailscale
                       # ./services/tailscale
+                    ];
+                  };
+
+                  red-turret = nixosSystem {
+                    inherit system;
+                    modules = attrValues self.nixosModules ++ [
+                      # hardware config
+                      ./hardware/lucernae-red-turret.nix
+                      # nixos config
+                      ./systems/nixos/red-turret
+                      # home-manager
+                      home-manager.nixosModules.home-manager
+                      {
+                        nixpkgs = nixpkgsConfig;
+                        # `home-manager` config
+                        home-manager.useGlobalPkgs = true;
+                        home-manager.useUserPackages = true;
+                        home-manager.users.lucernae = import ./home-manager/lucernae.nix;
+
+                        # pass to home configuration
+                        home-manager.extraSpecialArgs = {
+                          inherit (devenv.packages.${system}) devenv;
+                        };
+                      }
                     ];
                   };
 

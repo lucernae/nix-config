@@ -3,9 +3,9 @@
 
   inputs = {
     # Specify the source of Home Manager and Nixpkgs.
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
     home-manager = {
-      url = "github:nix-community/home-manager/release-25.05";
+      url = "github:nix-community/home-manager/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # Flake utils
@@ -45,10 +45,6 @@
           nixpkgsConfig = {
             config = {
               allowUnfree = true;
-              allowUnfreePredicate = pkg: builtins.elem (nixpkgs.lib.getName pkg) [
-                "vscode-extension-github-codespaces"
-                "gemini-cli"
-              ];
             };
           };
           pkgs = import nixpkgs {
@@ -56,7 +52,11 @@
             inherit (nixpkgsConfig) config;
             overlays = [
               (final: prev: {
-                unstable = import nixpkgs-unstable { system = prev.system; };
+                unstable = import nixpkgs-unstable {
+                  system = prev.stdenv.hostPlatform.system;
+                  inherit (nixpkgsConfig) config;
+                };
+                lima = final.unstable.lima;
                 nix-vscode-extensions = nix-vscode-extensions.extensions.${system};
                 pinentry-box = pinentry-box.packages.${system}.pinentry_box;
                 pinentry-box-cli = pinentry-box.packages.${system}.pinentry_box_cli;
@@ -90,6 +90,16 @@
               modules = [
                 { nixpkgs = nixpkgsConfig; }
                 ./vmware.nix
+              ];
+              extraSpecialArgs = {
+                inherit (devenv.packages.${system}) devenv;
+              };
+            };
+            lucernae = home-manager.lib.homeManagerConfiguration {
+              inherit pkgs;
+              modules = [
+                { nixpkgs = nixpkgsConfig; }
+                ./lucernae.nix
               ];
               extraSpecialArgs = {
                 inherit (devenv.packages.${system}) devenv;

@@ -1,6 +1,7 @@
 result
 .idea
 .vscode
+.claude
 !.vscode/tasks.json
 .DS_Store
 .devcontainer
