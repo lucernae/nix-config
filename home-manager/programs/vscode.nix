@@ -1,6 +1,33 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 let
   trace-enable = builtins.trace "checking nixpkgs config.allowUnfree: ${builtins.toJSON pkgs.config.allowUnfree}" (true);
+
+  # Default workspace settings that can be overridden
+  defaultWorkspaceSettings = {
+    "editor.stickyScroll.enabled" = true;
+    "git.enableCommitSigning" = true;
+    "editor.fontFamily" = "'FiraCode Nerd Font', 'DroidSans Nerd Font', Menlo, Monaco, 'Courier New', monospace";
+    "nix.enableLanguageServer" = true;
+    "nix.serverPath" = "nixd";
+    "terminal.integrated.automationProfile.linux" = { };
+    "terminal.integrated.defaultProfile.osx" = "zsh";
+    "terminal.integrated.defaultProfile.linux" = "zsh";
+    "terminal.integrated.enableMultiLinePasteWarning" = false;
+    "terminal.integrated.env.linux" = { };
+    "terminal.integrated.env.osx" = { };
+    "terminal.external.osxExec" = "/opt/homebrew/bin/ghostty";
+    "terminal.explorerKind" = "external";
+    "workbench.sideBar.location" = "right";
+    "editor.inlineSuggest.suppressSuggestions" = true;
+    "claudeCode.preferredLocation" = "panel";
+    "claudeCode.selectedModel" = "sonnet";
+  };
+
+  # Allow users to override workspace settings via config
+  workspaceSettings = lib.mkMerge [
+    defaultWorkspaceSettings
+    (lib.mkIf (config.programs.vscode.workspaceSettings or null != null) config.programs.vscode.workspaceSettings)
+  ];
 
   # Helper function to patch extension binaries to use Nix node
   patchExtensionForNix = ext: ext.overrideAttrs (oldAttrs: {
@@ -46,24 +73,8 @@ with pkgs;
     package = pkgs.unstable.vscode;
     profiles.default = {
       enableUpdateCheck = true;
-      userSettings = {
-        "editor.stickyScroll.enabled" = true;
-        "git.enableCommitSigning" = true;
-        "editor.fontFamily" = "'FiraCode Nerd Font', 'DroidSans Nerd Font', Menlo, Monaco, 'Courier New', monospace";
-        "nix.enableLanguageServer" = true;
-        "nix.serverPath" = "nixd";
-        "terminal.integrated.automationProfile.linux" = { };
-        "terminal.integrated.defaultProfile.osx" = "zsh";
-        "terminal.integrated.defaultProfile.linux" = "zsh";
-        "terminal.integrated.enableMultiLinePasteWarning" = false;
-        "terminal.integrated.env.linux" = { };
-        "terminal.integrated.env.osx" = { };
-        "terminal.external.osxExec" = "/opt/homebrew/bin/ghostty";
-        "terminal.explorerKind" = "external";
-        "workbench.sideBar.location" = "right";
-        "editor.inlineSuggest.suppressSuggestions" = true;
-        "claudeCode.preferredLocation" = "panel";
-      };
+      # Don't manage userSettings to allow mutable settings
+      # userSettings = workspaceSettings;
       extensions =
         (with nix-vscode-extensions.vscode-marketplace; [
           bbenoist.nix
@@ -101,4 +112,27 @@ with pkgs;
     };
     mutableExtensionsDir = true;
   };
+
+  # Create a default settings template that users can reference
+  home.file.".config/Code/User/settings.nix.example.json" = {
+    text = builtins.toJSON defaultWorkspaceSettings;
+  };
+
+  # Activation script to merge default settings into user settings (only once)
+  home.activation.vscodeDefaultSettings = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    SETTINGS_FILE="$HOME/.config/Code/User/settings.json"
+    DEFAULTS_FILE="$HOME/.config/Code/User/settings.nix.example.json"
+
+    # If settings.json doesn't exist, create it with defaults
+    if [ ! -f "$SETTINGS_FILE" ]; then
+      $DRY_RUN_CMD mkdir -p "$(dirname "$SETTINGS_FILE")"
+      $DRY_RUN_CMD cp "$DEFAULTS_FILE" "$SETTINGS_FILE"
+      $DRY_RUN_CMD chmod +w "$SETTINGS_FILE"
+      echo "Created VSCode settings.json with Nix defaults"
+    else
+      # Settings exist - user can manually merge from .nix.example.json if desired
+      echo "VSCode settings.json exists - preserving user settings"
+      echo "See ~/.config/Code/User/settings.nix.example.json for Nix-recommended defaults"
+    fi
+  '';
 }

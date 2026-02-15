@@ -124,12 +124,14 @@
     pciutils
     tailscale
     vlc
+    kwalletcli
   ];
 
   # Enable GnuPG agent
   programs.gnupg.agent = {
     enable = true;
     enableSSHSupport = true;
+    pinentryPackage = pkgs.pinentry-qt;
   };
 
   programs.zsh.enable = true;

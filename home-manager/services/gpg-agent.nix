@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 let
   homedir = config.programs.gpg.homedir;
 in
@@ -7,6 +7,10 @@ with pkgs;
   home.file."${homedir}/gpg-agent.conf".text = ''
     pinentry-timeout 86400
   '' +
+  # Use pinentry-kwallet on Linux for KWallet integration
+  (lib.strings.optionalString stdenv.isLinux ''
+    pinentry-program /run/current-system/sw/bin/pinentry-kwallet
+  '') +
   # commented out temporarily because we are testing custom pinentry
   (lib.strings.optionalString stdenv.isDarwin ''
     pinentry-program ${pinentry_mac}/Applications/pinentry-mac.app/Contents/MacOS/pinentry-mac
@@ -20,8 +24,10 @@ with pkgs;
   #  '');
 
   services.gpg-agent = {
-    enable = stdenv.isLinux;
+    enable = false;
+    # enable = stdenv.isLinux;
     enableZshIntegration = true;
     pinentry.package = pkgs.pinentry-qt;
+    # pinentry-qt should integrate with KWallet automatically on KDE Plasma
   };
 }
