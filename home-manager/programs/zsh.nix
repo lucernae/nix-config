@@ -10,7 +10,27 @@
       (lib.mkOrder 550 ''
         ZSH_DISABLE_COMPFIX=true
       '')
+
+      # Common initialization (both Linux and macOS)
       ''
+        # Set PATH for Rancher Desktop
+        export PATH="$HOME/.rd/bin:$PATH"
+
+        # NPM global packages
+        export NPM_CONFIG_PREFIX="$HOME/.npm-global"
+        export PATH="$HOME/.npm-global/bin:$PATH"
+
+        # Sourcing custom scripts
+        source ~/.scripts/zsh/*.sh
+
+        # Run Tailscale GPG connector script for Codespaces
+        if [[ -n "$CODESPACES" ]] && [[ ~/.scripts/tailscale-gpg-connector.sh ]]; then
+          ~/.scripts/tailscale-gpg-connector.sh
+        fi
+      ''
+
+      # macOS/Darwin specific initialization
+      (lib.optionalString pkgs.stdenv.isDarwin ''
         # Set PATH, MANPATH, etc., for Homebrew.
         # Doesn't need it now since we are using nix-homebrew
         # Intel Mac uses this one
@@ -21,14 +41,10 @@
         if [[ "$(uname)" == "Darwin" && "$(arch)" == "arm64" ]]; then
           eval "$(/opt/homebrew/bin/brew shellenv)"
         fi
+      '')
 
-        # Set PATH for Rancher Desktop
-        export PATH="$HOME/.rd/bin:$PATH"
-
-        # NPM global packages
-        export NPM_CONFIG_PREFIX="$HOME/.npm-global"
-        export PATH="$HOME/.npm-global/bin:$PATH"
-
+      # Linux specific initialization
+      (lib.optionalString pkgs.stdenv.isLinux ''
         # DBus session - required for KWallet integration
         export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u)/bus"
 
@@ -44,15 +60,7 @@
 
         # Set SSH_AUTH_SOCK to use gpg-agent (enables KWallet integration)
         export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
-
-        # Sourcing custom scripts
-        source ~/.scripts/zsh/*.sh
-
-        # Run Tailscale GPG connector script for Codespaces
-        if [[ -n "$CODESPACES" ]] && [[ ~/.scripts/tailscale-gpg-connector.sh ]]; then
-          ~/.scripts/tailscale-gpg-connector.sh
-        fi
-      ''
+      '')
     ];
     oh-my-zsh = {
       enable = true;
