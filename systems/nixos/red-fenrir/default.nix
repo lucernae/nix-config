@@ -49,7 +49,7 @@
     package = config.boot.kernelPackages.nvidiaPackages.stable;
   };
 
-  networking.hostName = "red-turret";
+  networking.hostName = "red-fenrir";
 
   # Enable networking
   networking.networkmanager.enable = true;

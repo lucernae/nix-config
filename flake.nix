@@ -248,13 +248,13 @@
                     ];
                   };
 
-                  red-turret = nixosSystem {
+                  red-fenrir = nixosSystem {
                     inherit system;
                     modules = attrValues self.nixosModules ++ [
                       # hardware config
-                      ./hardware/lucernae-red-turret.nix
+                      ./hardware/lucernae-red-fenrir.nix
                       # nixos config
-                      ./systems/nixos/red-turret
+                      ./systems/nixos/red-fenrir
                       # home-manager
                       home-manager.nixosModules.home-manager
                       {
