@@ -49,6 +49,12 @@
       url = "github:zeek/homebrew-zeek";
       flake = false;
     };
+    # Vicinae
+    vicinae.url = "github:vicinaehq/vicinae";
+    vicinae-extensions = {
+      url = "github:vicinaehq/extensions";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -69,6 +75,8 @@
     , homebrew-apple
     , homebrew-lizardbyte
     , homebrew-zeek
+    , vicinae
+    , vicinae-extensions
     , ...
     }@inputs:
     let
@@ -262,11 +270,17 @@
                         # `home-manager` config
                         home-manager.useGlobalPkgs = true;
                         home-manager.useUserPackages = true;
-                        home-manager.users.lucernae = import ./home-manager/lucernae.nix;
+                        home-manager.users.lucernae = {
+                          imports = [
+                            vicinae.homeManagerModules.default
+                            ./home-manager/lucernae.nix
+                          ];
+                        };
 
                         # pass to home configuration
                         home-manager.extraSpecialArgs = {
                           inherit (devenv.packages.${system}) devenv;
+                          inherit vicinae-extensions;
                         };
                       }
                     ];
