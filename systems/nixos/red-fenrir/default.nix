@@ -54,7 +54,31 @@
   networking.hostName = "red-fenrir";
 
   # Enable networking
-  networking.networkmanager.enable = true;
+  networking.networkmanager = {
+    enable = true;
+    # Use systemd-resolved for DNS
+    dns = "systemd-resolved";
+  };
+
+  # Configure NetworkManager to ignore DHCP DNS
+  environment.etc."NetworkManager/conf.d/dns.conf".text = ''
+    [connection]
+    ipv4.ignore-auto-dns=yes
+    ipv6.ignore-auto-dns=yes
+  '';
+
+  # DNS configuration with DNS-over-TLS
+  services.resolved = {
+    enable = true;
+    dnssec = "true";
+    domains = [ "~." ];
+    # Primary DNS servers (not just fallback)
+    extraConfig = ''
+      DNS=1.1.1.1 1.0.0.1 2606:4700:4700::1111 2606:4700:4700::1001
+    '';
+    fallbackDns = [ "1.1.1.1" "1.0.0.1" ];
+    dnsovertls = "true";
+  };
 
   # Enable Bluetooth
   hardware.bluetooth.enable = true;
@@ -131,6 +155,22 @@
     kdePackages.kwallet-pam
     kdePackages.ksshaskpass
     fastfetch
+
+    # Network diagnostic tools
+    bind          # dig, nslookup, host - DNS lookup tools
+    inetutils     # ping, traceroute, ifconfig, netstat
+    iproute2      # ip, ss - modern network utilities
+    tcpdump       # Packet capture and analysis
+    #wireshark     # GUI packet analyzer
+    nmap          # Network scanner
+    curl          # HTTP/HTTPS client
+    netcat-gnu    # TCP/UDP testing tool
+    mtr           # Network diagnostic tool (ping + traceroute)
+    iftop         # Network bandwidth monitoring
+    ethtool       # Ethernet device configuration
+    iperf3        # Network performance testing
+    whois         # Domain information lookup
+    dnsutils      # Additional DNS utilities
   ];
 
   # Enable GnuPG agent with SSH support
