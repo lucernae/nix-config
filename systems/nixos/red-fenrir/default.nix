@@ -157,20 +157,20 @@
     fastfetch
 
     # Network diagnostic tools
-    bind          # dig, nslookup, host - DNS lookup tools
-    inetutils     # ping, traceroute, ifconfig, netstat
-    iproute2      # ip, ss - modern network utilities
-    tcpdump       # Packet capture and analysis
+    bind # dig, nslookup, host - DNS lookup tools
+    inetutils # ping, traceroute, ifconfig, netstat
+    iproute2 # ip, ss - modern network utilities
+    tcpdump # Packet capture and analysis
     #wireshark     # GUI packet analyzer
-    nmap          # Network scanner
-    curl          # HTTP/HTTPS client
-    netcat-gnu    # TCP/UDP testing tool
-    mtr           # Network diagnostic tool (ping + traceroute)
-    iftop         # Network bandwidth monitoring
-    ethtool       # Ethernet device configuration
-    iperf3        # Network performance testing
-    whois         # Domain information lookup
-    dnsutils      # Additional DNS utilities
+    nmap # Network scanner
+    curl # HTTP/HTTPS client
+    netcat-gnu # TCP/UDP testing tool
+    mtr # Network diagnostic tool (ping + traceroute)
+    iftop # Network bandwidth monitoring
+    ethtool # Ethernet device configuration
+    iperf3 # Network performance testing
+    whois # Domain information lookup
+    dnsutils # Additional DNS utilities
   ];
 
   # Enable GnuPG agent with SSH support

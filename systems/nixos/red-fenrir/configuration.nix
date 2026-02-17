@@ -6,7 +6,8 @@
 
 {
   imports =
-    [ # Include the results of the hardware scan.
+    [
+      # Include the results of the hardware scan.
       ./hardware-configuration.nix
     ];
 
@@ -100,7 +101,7 @@
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
       kdePackages.kate
-    #  thunderbird
+      #  thunderbird
     ];
   };
 
@@ -125,16 +126,16 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-  #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-  #  wget
+    #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    #  wget
     vim
     wget
     claude-code
     vscode
-    kdePackages.filelight  # KDE disk usage analyzer
-    bitwarden-desktop      # Password manager
-    git                    # Version control
-    home-manager           # User environment manager (command only, not configured)
+    kdePackages.filelight # KDE disk usage analyzer
+    bitwarden-desktop # Password manager
+    git # Version control
+    home-manager # User environment manager (command only, not configured)
   ];
 
   # Some programs need SUID wrappers, can be configured further or are

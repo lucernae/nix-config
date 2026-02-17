@@ -45,7 +45,7 @@
                     #                              vaapiVdpau
                     #                              libvdpau-va-gl
                   ];
-              passthru.gpuSupport = true;
+                  passthru.gpuSupport = true;
                 })
             else
               pkgs.ollama;

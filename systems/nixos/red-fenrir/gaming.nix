@@ -26,20 +26,20 @@
   # Gaming-related system packages
   environment.systemPackages = with pkgs; [
     # Performance monitoring and overlay
-    mangohud              # FPS and performance overlay for Vulkan/OpenGL games
+    mangohud # FPS and performance overlay for Vulkan/OpenGL games
 
     # Proton version management
-    protonup-qt           # GUI tool to manage custom Proton versions (GE-Proton)
+    protonup-qt # GUI tool to manage custom Proton versions (GE-Proton)
 
     # Additional game launchers
-    lutris                # Open source gaming platform (supports Epic, GOG, etc.)
-    heroic                # Epic Games and GOG launcher
+    lutris # Open source gaming platform (supports Epic, GOG, etc.)
+    heroic # Epic Games and GOG launcher
 
     # Gaming compositor
-    gamescope             # SteamOS session compositing window manager
+    gamescope # SteamOS session compositing window manager
 
     # Gamepad/controller support
-    antimicrox            # Map keyboard and mouse to gamepad controls
+    antimicrox # Map keyboard and mouse to gamepad controls
   ];
 
   # Ensure gamemode is accessible to users

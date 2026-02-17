@@ -27,12 +27,13 @@ in
   # Packages always needed in the devcontainer (independent of feature flag)
   # These are used by start-gpg-bridge.sh which runs conditionally at runtime
   home.packages = [
-    pkgs.docker-client  # Docker CLI (uses host socket)
-    pkgs.tailscale      # Tailscale mesh VPN (for GPG bridge)
-    pkgs.socat          # Required for GPG forwarding bridge
-    pkgs.procps         # Provides pgrep/pkill
-    pkgs.jq             # JSON processing
-    pkgs.iproute2       # Provides ip link (used to detect kernel TUN vs userspace networking)
+    pkgs.unstable.opencode
+    pkgs.docker-client # Docker CLI (uses host socket)
+    pkgs.tailscale # Tailscale mesh VPN (for GPG bridge)
+    pkgs.socat # Required for GPG forwarding bridge
+    pkgs.procps # Provides pgrep/pkill
+    pkgs.jq # JSON processing
+    pkgs.iproute2 # Provides ip link (used to detect kernel TUN vs userspace networking)
   ] ++ lib.optionals (builtins.getEnv "CODESPACES" == "true") [
     pkgs.xdg-utils
   ];

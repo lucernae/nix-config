@@ -54,7 +54,10 @@
 				"bbenoist.Nix",
 				"jnoortheen.nix-ide",
 				"brettm12345.nixfmt-vscode",
+				"github.codespaces",
 				"tailscale.vscode-tailscale",
+				"anthropic.claude-code",
+				"sst-dev.opencode",
 				"github.copilot",
 				"github.copilot-chat"
 			],

@@ -105,10 +105,10 @@ with pkgs;
           cucumberopen.cucumber-official
         ]) ++ (with extensions-override; [
           # Patched extensions with NixOS fixes
-          claude-code  # Uses Nix claude binary
-          ms-python  # Patched for NixOS
-          ms-vscode-remote-containers  # Patched for NixOS
-          ms-vscode-remote-ssh  # Patched for NixOS
+          claude-code # Uses Nix claude binary
+          ms-python # Patched for NixOS
+          ms-vscode-remote-containers # Patched for NixOS
+          ms-vscode-remote-ssh # Patched for NixOS
         ]);
     };
     mutableExtensionsDir = true;
@@ -120,7 +120,7 @@ with pkgs;
   };
 
   # Activation script to merge default settings into user settings (only once)
-  home.activation.vscodeDefaultSettings = lib.hm.dag.entryAfter ["writeBoundary"] ''
+  home.activation.vscodeDefaultSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     SETTINGS_FILE="$HOME/.config/Code/User/settings.json"
     DEFAULTS_FILE="$HOME/.config/Code/User/settings.nix.example.json"
 

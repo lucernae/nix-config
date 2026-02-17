@@ -20,27 +20,6 @@ if [ "${ENABLE_GPG_FORWARD:-false}" != "true" ]; then
   exit 0
 fi
 
-# Import GPG key from GitHub user
-# Try to auto-detect GitHub username from env var, git remote, or fall back to lucernae
-if [ -n "${GITHUB_USER:-}" ]; then
-    GITHUB_USER="$GITHUB_USER"
-elif [ -n "${GITHUB_REPOSITORY_OWNER:-}" ]; then
-    GITHUB_USER="$GITHUB_REPOSITORY_OWNER"
-else
-    # Try to extract from git remote origin URL
-    GITHUB_USER=$(git config --get remote.origin.url 2>/dev/null | sed -n 's|.*github.com[:/]\([^/]*\)/.*|\1|p' || echo "")
-fi
-GITHUB_USER="${GITHUB_USER:-lucernae}"
-
-GPG_KEY_URL="https://github.com/${GITHUB_USER}.gpg"
-
-echo "[gpg-bridge] Importing GPG key from ${GPG_KEY_URL}..."
-if curl -fsSL "${GPG_KEY_URL}" | gpg --import - 2>/dev/null; then
-    echo "[gpg-bridge] GPG key imported successfully from ${GITHUB_USER}'s GitHub profile"
-else
-    echo "[gpg-bridge] Warning: Could not import GPG key from ${GPG_KEY_URL}"
-fi
-
 LOCAL_MACHINE="${GPG_FORWARDER_HOST:-}"
 LOCAL_PORT="${GPG_FORWARDER_PORT:-23456}"
 TS_SOCKET="/var/run/tailscale/tailscaled.sock"
@@ -71,6 +50,9 @@ resolve_ts_host() {
 
 GPG_SOCKET_DIR="$HOME/.gnupg"
 GPG_SOCKET="$GPG_SOCKET_DIR/S.gpg-agent"
+
+# Set GPG_TTY for pinentry to work correctly
+export GPG_TTY=$(tty)
 BRIDGE_PID_FILE="/tmp/gpg-bridge.pid"
 BRIDGE_LOG="/tmp/gpg-bridge.log"
 
@@ -181,7 +163,7 @@ fi
 # Start the socat bridge in the background
 log "Starting bridge: $BRIDGE_TCP -> $GPG_SOCKET"
 socat \
-  "UNIX-LISTEN:$GPG_SOCKET,fork,unlink-early,mode=600" \
+      "UNIX-LISTEN:$GPG_SOCKET,fork,unlink-early,mode=600,reuseaddr" \
   "$BRIDGE_TCP" \
   >> "$BRIDGE_LOG" 2>&1 &
 
@@ -203,7 +185,7 @@ if pgrep -u "$(id -u)" gpg-agent >/dev/null 2>&1; then
     kill "$BRIDGE_PID" 2>/dev/null || true
     rm -f "$GPG_SOCKET"
     socat \
-      "UNIX-LISTEN:$GPG_SOCKET,fork,unlink-early,mode=600" \
+  "UNIX-LISTEN:$GPG_SOCKET,fork,unlink-early,mode=600,reuseaddr" \
       "$BRIDGE_TCP" \
       >> "$BRIDGE_LOG" 2>&1 &
     BRIDGE_PID=$!
@@ -212,9 +194,31 @@ if pgrep -u "$(id -u)" gpg-agent >/dev/null 2>&1; then
   fi
 fi
 
-if gpg-connect-agent --no-autostart -S "$GPG_SOCKET" /bye >/dev/null 2>&1; then
-  log "GPG agent responds through bridge. Setup complete."
-else
+if ! gpg-connect-agent --no-autostart -S "$GPG_SOCKET" /bye >/dev/null 2>&1; then
   log "Warning: GPG agent did not respond through bridge."
   log "Check log: $BRIDGE_LOG"
+  exit 1
+fi
+
+log "GPG agent responds through bridge. Setup complete."
+
+# Import GPG key from GitHub user after forwarding is established
+# Try to auto-detect GitHub username from env var, git remote, or fall back to lucernae
+if [ -n "${GITHUB_USER:-}" ]; then
+    GITHUB_USER="$GITHUB_USER"
+elif [ -n "${GITHUB_REPOSITORY_OWNER:-}" ]; then
+    GITHUB_USER="$GITHUB_REPOSITORY_OWNER"
+else
+    # Try to extract from git remote origin URL
+    GITHUB_USER=$(git config --get remote.origin.url 2>/dev/null | sed -n 's|.*github.com[:/]\([^/]*\)/.*|\1|p' || echo "")
+fi
+GITHUB_USER="${GITHUB_USER:-lucernae}"
+
+GPG_KEY_URL="https://github.com/${GITHUB_USER}.gpg"
+
+log "Importing GPG key from ${GPG_KEY_URL}..."
+if curl -fsSL "${GPG_KEY_URL}" | gpg --import - 2>/dev/null; then
+    log "GPG key imported successfully from ${GITHUB_USER}'s GitHub profile"
+else
+    log "Warning: Could not import GPG key from ${GPG_KEY_URL}"
 fi

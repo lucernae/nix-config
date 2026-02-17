@@ -2,7 +2,7 @@
 
 let
   cfg = config.myConfig.gpgForwarding;
-  
+
   gpg-forwarder-script = pkgs.writeShellScriptBin "gpg-agent-forwarder" ''
     set -e
 
