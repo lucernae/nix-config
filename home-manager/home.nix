@@ -8,7 +8,6 @@
     git
     # vim # declared as programs.vim
     gh
-    colima
     nixd
     act
     comma
@@ -27,12 +26,7 @@
     cmake
     yarn
     poetry
-  ] ++ (
-    lib.optionals stdenv.isDarwin [
-      pinentry-box-cli
-    ]
-  )
-  ++ (lib.optionals stdenv.isLinux [ kdePackages.kgpg kwalletcli ]);
+  ];
 
   home.file.scripts = {
     enable = true;

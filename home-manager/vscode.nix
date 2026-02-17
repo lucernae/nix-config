@@ -14,12 +14,11 @@
     ./programs/gemini-cli.nix
   ];
 
-  # Conditionally install xdg-utils in GitHub Codespaces
-  home.packages = lib.mkIf (builtins.getEnv "CODESPACES" == "true") [
+  home.packages = [
+    pkgs.socat    # Required for GPG forwarding bridge
+    pkgs.procps   # Provides pgrep/pkill
+  ] ++ lib.optionals (builtins.getEnv "CODESPACES" == "true") [
     pkgs.xdg-utils
-    pkgs.socat # New: Required for GPG forwarding
-    pkgs.tailscale # New: Required for GPG forwarding
-    pkgs.procps # Provides pgrep
   ];
 
 }

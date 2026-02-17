@@ -22,7 +22,9 @@
   home.packages = with pkgs; [
     obsidian
     raycast
-    socat # New: Required for GPG forwarding
+    socat # Required for GPG forwarding
+    colima
+    pinentry-box-cli
     # tailscale # Tailscale package provided by nix homebrew
   ];
 

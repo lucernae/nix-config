@@ -17,6 +17,7 @@
     ./programs/claude-code.nix
     ./programs/vicinae.nix
     ./services/gpg-agent.nix
+    ./services/gpg-agent-forwarder.nix
   ];
 
   home.packages = with pkgs; [
@@ -26,6 +27,9 @@
     jetbrains-toolbox
     bottles
     pcsx2
+    devcontainer
+    kdePackages.kgpg
+    kwalletcli
   ];
 
   home.sessionPath = [
