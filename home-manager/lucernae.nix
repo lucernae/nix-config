@@ -1,8 +1,5 @@
 { config, pkgs, lib, ... }:
 
-let
-  cfg = config.myConfig.gpgForwarding;
-in
 {
   # Home Manager needs a bit of information about you and the
   # paths it should manage.
@@ -24,7 +21,8 @@ in
     ./programs/claude-code.nix
     ./programs/vicinae.nix
     ./services/gpg-agent.nix
-  ] ++ lib.optional cfg.enable ./services/gpg-agent-forwarder.nix;
+    ./services/gpg-agent-forwarder.nix
+  ];
 
   home.packages = with pkgs; [
     kubernetes-helm

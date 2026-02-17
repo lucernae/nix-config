@@ -1,8 +1,5 @@
 { config, pkgs, lib, ... }:
 
-let
-  cfg = config.myConfig.gpgForwarding;
-in
 {
   # Home Manager needs a bit of information about you and the
   # paths it should manage.
@@ -23,7 +20,8 @@ in
     ./programs/starship.nix
     ./services/gpg-agent.nix
     ./programs/gemini-cli.nix
-  ] ++ lib.optional cfg.enable ./services/gpg-agent-forwarder.nix;
+    ./services/gpg-agent-forwarder.nix
+  ];
 
   home.packages = with pkgs; [
     obsidian
