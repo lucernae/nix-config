@@ -13,6 +13,7 @@
     ./programs/zsh.nix
     ./programs/starship.nix
     ./programs/gemini-cli.nix
+    ./programs/claude-code.nix
   ];
 
   # Prevent gpg from auto-starting a local gpg-agent;
@@ -20,12 +21,12 @@
   programs.gpg.settings.no-autostart = true;
 
   home.packages = [
-    pkgs.claude-code    # Claude Code CLI
     pkgs.docker-client  # Docker CLI (uses host socket)
     pkgs.tailscale      # Tailscale mesh VPN
     pkgs.socat          # Required for GPG forwarding bridge
     pkgs.procps         # Provides pgrep/pkill
     pkgs.jq             # JSON processing
+    pkgs.iproute2       # Provides ip link (used to detect kernel TUN vs userspace networking)
   ] ++ lib.optionals (builtins.getEnv "CODESPACES" == "true") [
     pkgs.xdg-utils
   ];

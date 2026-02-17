@@ -17,6 +17,7 @@ set -euo pipefail
 LOCAL_MACHINE="${GPG_FORWARDER_HOST:-}"
 LOCAL_PORT="${GPG_FORWARDER_PORT:-23456}"
 TS_SOCKET="/var/run/tailscale/tailscaled.sock"
+SOCKS5_PORT="${TAILSCALE_SOCKS5_PORT:-1055}"
 
 # Resolve Tailscale hostname to IP (needed for userspace networking where MagicDNS is unavailable)
 resolve_ts_host() {
@@ -48,13 +49,49 @@ BRIDGE_LOG="/tmp/gpg-bridge.log"
 
 log() { echo "[gpg-bridge] $*"; }
 
+# Detect which Tailscale networking mode is active.
+# Kernel TUN mode creates a tailscale0 interface; userspace mode does not.
+# In userspace mode, direct TCP to Tailscale IPs is unreachable from the kernel;
+# all outbound connections must go through the SOCKS5 proxy on localhost:$SOCKS5_PORT.
+is_userspace_networking() {
+  ! ip link show tailscale0 &>/dev/null
+}
+
+# Wait for Tailscale to authenticate and have at least one peer visible.
+wait_for_tailscale() {
+  local retries=20
+  log "Waiting for Tailscale to be ready..."
+  for i in $(seq 1 $retries); do
+    if sudo tailscale --socket="$TS_SOCKET" status &>/dev/null; then
+      log "Tailscale is ready."
+      return 0
+    fi
+    sleep 1
+  done
+  log "Tailscale not ready after ${retries}s — continuing anyway."
+}
+
 if [ -z "$LOCAL_MACHINE" ]; then
   log "GPG_FORWARDER_HOST not set — skipping GPG bridge."
   log "Set it to your local machine's Tailscale name or Docker host IP."
   exit 0
 fi
 
+# Detect userspace networking: in Codespaces, tailscaled runs with --tun=userspace-networking,
+# which means direct TCP to Tailscale IPs is unreachable from the kernel. All connections must
+# go through the SOCKS5 proxy that tailscaled exposes on localhost:$SOCKS5_PORT.
+USE_SOCKS5=false
+if is_userspace_networking; then
+  USE_SOCKS5=true
+  log "No tailscale0 interface found — userspace-networking mode, using SOCKS5 proxy on localhost:$SOCKS5_PORT."
+  wait_for_tailscale
+else
+  log "tailscale0 interface present — kernel TUN mode, using direct TCP."
+fi
+
 # Resolve Tailscale hostname to IP
+# When using SOCKS5, the proxy handles DNS so an IP isn't strictly required,
+# but we resolve anyway for logging clarity.
 RESOLVED=$(resolve_ts_host "$LOCAL_MACHINE")
 if [ "$RESOLVED" != "$LOCAL_MACHINE" ]; then
   log "Resolved $LOCAL_MACHINE -> $RESOLVED"
@@ -90,19 +127,35 @@ fi
 
 # Verify the remote forwarder is reachable
 log "Testing connection to $LOCAL_MACHINE:$LOCAL_PORT ..."
-if ! socat /dev/null "TCP:$LOCAL_MACHINE:$LOCAL_PORT,connect-timeout=5" 2>/dev/null; then
+if [ "$USE_SOCKS5" = "true" ]; then
+  TCP_ADDR="SOCKS4A:localhost:$LOCAL_MACHINE:$LOCAL_PORT,socksport=$SOCKS5_PORT,connect-timeout=5"
+else
+  TCP_ADDR="TCP:$LOCAL_MACHINE:$LOCAL_PORT,connect-timeout=5"
+fi
+if ! socat /dev/null "$TCP_ADDR" 2>/dev/null; then
   log "Cannot reach $LOCAL_MACHINE:$LOCAL_PORT."
   log "Ensure gpg-agent-forwarder is running on the local machine."
   log "Check: systemctl --user status gpg-agent-forwarder.service"
+  if [ "$USE_SOCKS5" = "true" ]; then
+    log "Connection was attempted via SOCKS5 proxy (localhost:$SOCKS5_PORT)."
+    log "Verify Tailscale is authenticated: sudo tailscale --socket=$TS_SOCKET status"
+  fi
   exit 1
 fi
 log "Connection OK."
 
+# Build the TCP address for the bridge (with or without SOCKS5 proxy)
+if [ "$USE_SOCKS5" = "true" ]; then
+  BRIDGE_TCP="SOCKS4A:localhost:$LOCAL_MACHINE:$LOCAL_PORT,socksport=$SOCKS5_PORT"
+else
+  BRIDGE_TCP="TCP:$LOCAL_MACHINE:$LOCAL_PORT"
+fi
+
 # Start the socat bridge in the background
-log "Starting bridge: TCP $LOCAL_MACHINE:$LOCAL_PORT -> $GPG_SOCKET"
+log "Starting bridge: $BRIDGE_TCP -> $GPG_SOCKET"
 socat \
   "UNIX-LISTEN:$GPG_SOCKET,fork,unlink-early,mode=600" \
-  "TCP:$LOCAL_MACHINE:$LOCAL_PORT" \
+  "$BRIDGE_TCP" \
   >> "$BRIDGE_LOG" 2>&1 &
 
 BRIDGE_PID=$!
@@ -124,7 +177,7 @@ if pgrep -u "$(id -u)" gpg-agent >/dev/null 2>&1; then
     rm -f "$GPG_SOCKET"
     socat \
       "UNIX-LISTEN:$GPG_SOCKET,fork,unlink-early,mode=600" \
-      "TCP:$LOCAL_MACHINE:$LOCAL_PORT" \
+      "$BRIDGE_TCP" \
       >> "$BRIDGE_LOG" 2>&1 &
     BRIDGE_PID=$!
     echo "$BRIDGE_PID" > "$BRIDGE_PID_FILE"
