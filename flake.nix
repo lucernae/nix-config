@@ -146,6 +146,11 @@
           formatter = nixpkgs.legacyPackages.${system}.nixpkgs-fmt;
           packages =
             {
+              # Debian VM launcher (QEMU-based, headless/server, no GUI).
+              # Uses Debian genericcloud QCOW2 + cloud-init. No installer needed.
+              # Usage: nix run .#debian-vm
+              debian-vm = nixpkgs.legacyPackages.${system}.callPackage ./systems/debian-vm { };
+
               darwinConfigurations =
                 if isDarwin system then rec {
                   recalune = darwinSystem {
@@ -316,6 +321,16 @@
                           inherit (devenv.packages.${system}) devenv;
                         };
                       }
+                    ];
+                  };
+
+                  # Remote aarch64 Linux builder (VPS/cloud)
+                  # See systems/nixos/nix-linux-builder/README.md for bootstrap instructions
+                  nix-linux-builder = nixosSystem {
+                    system = "aarch64-linux";
+                    modules = attrValues self.nixosModules ++ [
+                      # nixos config
+                      ./systems/nixos/nix-linux-builder/configuration.nix
                     ];
                   };
                 } else { };

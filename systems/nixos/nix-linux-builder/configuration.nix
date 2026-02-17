@@ -2,7 +2,10 @@
   imports = [
     ./hardware-configuration.nix
     ./networking.nix # generated at runtime by nixos-infect
+    (fetchTarball "https://github.com/nix-community/nixos-vscode-server/tarball/master")
   ];
+
+  services.vscode-server.enable = true;
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
@@ -19,15 +22,18 @@
     tailscale
     #openvpn
     python3
-    #nodejs
-    #docker-compose
+    nodejs
+    #colima
+    docker-compose
+    claude-code
   ];
 
+  programs.vim.enable = true;
   programs.vim.defaultEditor = true;
 
   networking.firewall = {
     enable = true;
-    allowedTCPPorts = [ 22 80 ];
+    allowedTCPPorts = [ 22 80 443 ];
   };
 
   boot.binfmt.emulatedSystems = [ "x86_64-linux" ];
@@ -37,18 +43,27 @@
   networking.hostName = "nix-linux-builder";
   networking.domain = "";
   services.openssh.enable = true;
+  services.fail2ban.enable = true;
+  virtualisation.docker = {
+    enable = true;
+    enableOnBoot = true;
+  };
 
   services.nix-serve = {
     enable = true;
     secretKeyFile = "/root/nix-serve/cache-priv-key.pem";
   };
   services.tailscale.enable = true;
+  security.acme.acceptTerms = true;
+  security.acme.defaults.email = "lana.pcfre@gmail.com";
   services.nginx = {
     enable = true;
     recommendedProxySettings = true;
     virtualHosts = {
       # ... existing hosts config etc. ...
       "nix-cache.maulana.id" = {
+        forceSSL = true;
+        enableACME = true;
         locations."/".proxyPass = "http://${config.services.nix-serve.bindAddress}:${toString config.services.nix-serve.port}";
       };
     };
