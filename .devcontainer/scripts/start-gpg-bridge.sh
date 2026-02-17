@@ -16,6 +16,30 @@ set -euo pipefail
 
 LOCAL_MACHINE="${GPG_FORWARDER_HOST:-}"
 LOCAL_PORT="${GPG_FORWARDER_PORT:-23456}"
+TS_SOCKET="/var/run/tailscale/tailscaled.sock"
+
+# Resolve Tailscale hostname to IP (needed for userspace networking where MagicDNS is unavailable)
+resolve_ts_host() {
+  local host="$1"
+  # Already an IP address — nothing to resolve
+  if [[ "$host" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    echo "$host"
+    return
+  fi
+  # Try resolving via tailscale status --json
+  if command -v tailscale &>/dev/null && [ -S "$TS_SOCKET" ]; then
+    local ip
+    ip=$(sudo tailscale --socket="$TS_SOCKET" status --json 2>/dev/null \
+      | jq -r --arg name "$host" '.Peer[] | select(.HostName == $name) | .TailscaleIPs[0] // empty' 2>/dev/null \
+      | head -1)
+    if [ -n "$ip" ]; then
+      echo "$ip"
+      return
+    fi
+  fi
+  # Fallback to the original hostname
+  echo "$host"
+}
 
 GPG_SOCKET_DIR="$HOME/.gnupg"
 GPG_SOCKET="$GPG_SOCKET_DIR/S.gpg-agent"
@@ -30,6 +54,13 @@ if [ -z "$LOCAL_MACHINE" ]; then
   exit 0
 fi
 
+# Resolve Tailscale hostname to IP
+RESOLVED=$(resolve_ts_host "$LOCAL_MACHINE")
+if [ "$RESOLVED" != "$LOCAL_MACHINE" ]; then
+  log "Resolved $LOCAL_MACHINE -> $RESOLVED"
+fi
+LOCAL_MACHINE="$RESOLVED"
+
 # Kill any previous bridge instance
 if [ -f "$BRIDGE_PID_FILE" ]; then
   OLD_PID=$(cat "$BRIDGE_PID_FILE")
@@ -39,7 +70,13 @@ if [ -f "$BRIDGE_PID_FILE" ]; then
   fi
   rm -f "$BRIDGE_PID_FILE"
 fi
-rm -f "$GPG_SOCKET"
+
+# Kill any running gpg-agent to prevent it from taking over the socket
+log "Stopping any running gpg-agent..."
+gpgconf --kill gpg-agent 2>/dev/null || true
+pkill -u "$(id -u)" gpg-agent 2>/dev/null || true
+
+rm -f "$GPG_SOCKET" "${GPG_SOCKET}.extra" "${GPG_SOCKET}.browser" "${GPG_SOCKET}.ssh"
 
 # Prepare gnupg dir
 mkdir -p "$GPG_SOCKET_DIR"
@@ -74,6 +111,27 @@ log "Bridge started (PID $BRIDGE_PID). Log: $BRIDGE_LOG"
 
 # Quick smoke-test: gpg-connect-agent should respond through the bridge
 sleep 0.5
+
+# Kill any gpg-agent that auto-started during setup (e.g. triggered by VS Code)
+if pgrep -u "$(id -u)" gpg-agent >/dev/null 2>&1; then
+  log "Detected auto-started gpg-agent, killing it..."
+  pkill -u "$(id -u)" gpg-agent 2>/dev/null || true
+  sleep 0.3
+  # Socat's unlink-early means we need to re-check the socket
+  if [ ! -S "$GPG_SOCKET" ]; then
+    log "Socket was replaced by gpg-agent, restarting socat..."
+    kill "$BRIDGE_PID" 2>/dev/null || true
+    rm -f "$GPG_SOCKET"
+    socat \
+      "UNIX-LISTEN:$GPG_SOCKET,fork,unlink-early,mode=600" \
+      "TCP:$LOCAL_MACHINE:$LOCAL_PORT" \
+      >> "$BRIDGE_LOG" 2>&1 &
+    BRIDGE_PID=$!
+    echo "$BRIDGE_PID" > "$BRIDGE_PID_FILE"
+    sleep 0.5
+  fi
+fi
+
 if gpg-connect-agent --no-autostart -S "$GPG_SOCKET" /bye >/dev/null 2>&1; then
   log "GPG agent responds through bridge. Setup complete."
 else

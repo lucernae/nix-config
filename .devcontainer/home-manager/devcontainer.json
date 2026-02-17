@@ -24,7 +24,8 @@
 	"remoteEnv": {
 		"LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}",
 		"GPG_FORWARDER_HOST": "${localEnv:GPG_FORWARDER_HOST}",
-		"GPG_FORWARDER_PORT": "${localEnv:GPG_FORWARDER_PORT}"
+		"GPG_FORWARDER_PORT": "${localEnv:GPG_FORWARDER_PORT}",
+		"TAILSCALE_AUTH_KEY": "${localEnv:TAILSCALE_AUTH_KEY}"
 	},
 
 	// Use 'forwardPorts' to make a list of qqports inside the container available locally.
@@ -39,8 +40,8 @@
 	// Uncomment the next line to run commands after the container is created - for example installing curl.
 	"postCreateCommand": "bash /library-scripts/runtime/postCreateCommand.sh || bash /workspaces/nix-config/.devcontainer/home-manager/custom/postCreateCommand.sh || true",
 
-	// Start GPG bridge on every container start (postStartCommand runs after each start, not just create)
-	"postStartCommand": "bash /workspaces/nix-config/.devcontainer/scripts/start-gpg-bridge.sh || true",
+	// Start Tailscale and GPG bridge on every container start (postStartCommand runs after each start, not just create)
+	"postStartCommand": "bash /workspaces/nix-config/.devcontainer/scripts/start-tailscaled.sh || true; bash /workspaces/nix-config/.devcontainer/scripts/start-gpg-bridge.sh || true",
 
 	// Uncomment to connect as a non-root user if you've added one. See https://aka.ms/vscode-remote/containers/non-root.
 	"remoteUser": "vscode",
