@@ -1,5 +1,14 @@
 { config, pkgs, lib, ... }:
+
 {
+  options.myConfig.gpgForwarding = {
+    enable = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Enable GPG agent forwarding over Tailscale via socat bridge";
+    };
+  };
+
   home.packages = with pkgs; [
     iconv
     htop

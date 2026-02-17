@@ -1,9 +1,16 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
+
+let
+  cfg = config.myConfig.gpgForwarding;
+in
 {
   # Home Manager needs a bit of information about you and the
   # paths it should manage.
   home.username = "recalune";
   home.homeDirectory = "/Users/recalune";
+
+  # Enable GPG agent forwarding over Tailscale
+  myConfig.gpgForwarding.enable = true;
 
   imports = [
     ./home.nix
@@ -16,8 +23,7 @@
     ./programs/starship.nix
     ./services/gpg-agent.nix
     ./programs/gemini-cli.nix
-    ./services/gpg-agent-forwarder.nix # New: GPG agent forwarder service
-  ];
+  ] ++ lib.optional cfg.enable ./services/gpg-agent-forwarder.nix;
 
   home.packages = with pkgs; [
     obsidian

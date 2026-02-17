@@ -40,8 +40,8 @@
 	// Uncomment the next line to run commands after the container is created - for example installing curl.
 	"postCreateCommand": "bash /library-scripts/runtime/postCreateCommand.sh || bash /workspaces/nix-config/.devcontainer/home-manager/custom/postCreateCommand.sh || true",
 
-	// Start Tailscale and GPG bridge on every container start (postStartCommand runs after each start, not just create)
-	"postStartCommand": "bash /workspaces/nix-config/.devcontainer/scripts/start-tailscaled.sh || true; bash /workspaces/nix-config/.devcontainer/scripts/start-gpg-bridge.sh || true",
+	// Start Tailscale and conditionally GPG bridge on every container start (postStartCommand runs after each start, not just create)
+	"postStartCommand": "bash /workspaces/nix-config/.devcontainer/scripts/start-tailscaled.sh || true; if [ \"${ENABLE_GPG_FORWARD:-false}\" = \"true\" ]; then bash /workspaces/nix-config/.devcontainer/scripts/start-gpg-bridge.sh || true; fi",
 
 	// Uncomment to connect as a non-root user if you've added one. See https://aka.ms/vscode-remote/containers/non-root.
 	"remoteUser": "vscode",
@@ -53,8 +53,14 @@
 				"arrterian.nix-env-selector",
 				"bbenoist.Nix",
 				"jnoortheen.nix-ide",
-				"brettm12345.nixfmt-vscode"
-			]
+				"brettm12345.nixfmt-vscode",
+				"tailscale.vscode-tailscale",
+				"github.copilot",
+				"github.copilot-chat"
+			],
+			"settings": {
+				"extensions.verifySignature": false
+			}
 		}
 	}
 }

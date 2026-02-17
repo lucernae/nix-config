@@ -1,6 +1,8 @@
 { config, pkgs, lib, ... }:
 
 let
+  cfg = config.myConfig.gpgForwarding;
+  
   gpg-forwarder-script = pkgs.writeShellScriptBin "gpg-agent-forwarder" ''
     set -e
 
@@ -26,7 +28,7 @@ let
 in
 {
   # macOS (launchd)
-  launchd.agents.gpg-agent-forwarder = lib.mkIf pkgs.stdenv.isDarwin {
+  launchd.agents.gpg-agent-forwarder = lib.mkIf (cfg.enable && pkgs.stdenv.isDarwin) {
     enable = true;
     config = {
       Label = "id.maulana.gpg-agent-forwarder";
@@ -39,7 +41,7 @@ in
   };
 
   # Linux (systemd user service)
-  systemd.user.services.gpg-agent-forwarder = lib.mkIf pkgs.stdenv.isLinux {
+  systemd.user.services.gpg-agent-forwarder = lib.mkIf (cfg.enable && pkgs.stdenv.isLinux) {
     Unit = {
       Description = "GPG Agent TCP Forwarder over Tailscale";
       After = [ "gpg-agent.socket" ];

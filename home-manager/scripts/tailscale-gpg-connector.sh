@@ -5,7 +5,7 @@
 # It connects to the local laptop's GPG agent via Tailscale and socat.
 
 # Your local laptop's Tailscale machine name
-LAPTOP_TAILSCALE_NAME="recalune-air"
+LAPTOP_TAILSCALE_NAME="${GPG_FORWARDER_HOST:-}"
 # The port socat is listening on your laptop
 SOCAT_PORT="23456"
 # The path where the GPG agent socket will be created in the Codespace

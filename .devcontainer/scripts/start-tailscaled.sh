@@ -71,6 +71,14 @@ if [ ! -S "$TS_SOCKET" ]; then
   exit 1
 fi
 
+# Get repo name from git remote (e.g., "nix-config" from https://github.com/user/nix-config)
+REPO_NAME=$(git remote get-url origin 2>/dev/null | sed -n 's/.*\/\([^\/]*\)\(\.git\)*$/\1/p')
+
+# Fallback if not in a git repo or no origin remote
+if [ -z "$REPO_NAME" ]; then
+  REPO_NAME="devcontainer"
+fi
+
 # Authenticate.
 # TAILSCALE_AUTH_KEY is the Codespace secret name; TS_AUTH_KEY is the official alias.
 AUTH_KEY="${TAILSCALE_AUTH_KEY:-${TS_AUTH_KEY:-}}"
@@ -81,7 +89,7 @@ if [ -n "$AUTH_KEY" ]; then
   sudo tailscale "${TS_ARGS[@]}" up \
     --accept-routes \
     --authkey="$AUTH_KEY" \
-    --hostname="devcontainer-$(hostname)"
+    --hostname="${REPO_NAME}"
   log "Tailscale up and authenticated."
 else
   log "No TAILSCALE_AUTH_KEY set. To connect, run:"

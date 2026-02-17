@@ -1,9 +1,16 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
+
+let
+  cfg = config.myConfig.gpgForwarding;
+in
 {
   # Home Manager needs a bit of information about you and the
   # paths it should manage.
   home.username = "lucernae";
   home.homeDirectory = "/home/lucernae";
+
+  # Enable GPG agent forwarding over Tailscale
+  myConfig.gpgForwarding.enable = true;
 
   imports = [
     ./home.nix
@@ -17,8 +24,7 @@
     ./programs/claude-code.nix
     ./programs/vicinae.nix
     ./services/gpg-agent.nix
-    ./services/gpg-agent-forwarder.nix
-  ];
+  ] ++ lib.optional cfg.enable ./services/gpg-agent-forwarder.nix;
 
   home.packages = with pkgs; [
     kubernetes-helm

@@ -14,6 +14,33 @@
 
 set -euo pipefail
 
+# Check if GPG forwarding is enabled
+if [ "${ENABLE_GPG_FORWARD:-false}" != "true" ]; then
+  echo "[gpg-bridge] ENABLE_GPG_FORWARD is not set to 'true' — skipping GPG bridge setup."
+  exit 0
+fi
+
+# Import GPG key from GitHub user
+# Try to auto-detect GitHub username from env var, git remote, or fall back to lucernae
+if [ -n "${GITHUB_USER:-}" ]; then
+    GITHUB_USER="$GITHUB_USER"
+elif [ -n "${GITHUB_REPOSITORY_OWNER:-}" ]; then
+    GITHUB_USER="$GITHUB_REPOSITORY_OWNER"
+else
+    # Try to extract from git remote origin URL
+    GITHUB_USER=$(git config --get remote.origin.url 2>/dev/null | sed -n 's|.*github.com[:/]\([^/]*\)/.*|\1|p' || echo "")
+fi
+GITHUB_USER="${GITHUB_USER:-lucernae}"
+
+GPG_KEY_URL="https://github.com/${GITHUB_USER}.gpg"
+
+echo "[gpg-bridge] Importing GPG key from ${GPG_KEY_URL}..."
+if curl -fsSL "${GPG_KEY_URL}" | gpg --import - 2>/dev/null; then
+    echo "[gpg-bridge] GPG key imported successfully from ${GITHUB_USER}'s GitHub profile"
+else
+    echo "[gpg-bridge] Warning: Could not import GPG key from ${GPG_KEY_URL}"
+fi
+
 LOCAL_MACHINE="${GPG_FORWARDER_HOST:-}"
 LOCAL_PORT="${GPG_FORWARDER_PORT:-23456}"
 TS_SOCKET="/var/run/tailscale/tailscaled.sock"

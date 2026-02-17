@@ -47,6 +47,8 @@ services:
       NIX_MULTI_USER: "true"
       NIX_REMOTE: "daemon"
       VSCODE_SERVER_CUSTOM_GLIBC_LINKER: "true"
+      # Enable GPG agent forwarding over Tailscale (set to "true" to enable)
+      ENABLE_GPG_FORWARD: "${ENABLE_GPG_FORWARD:-false}"
 
     # For ptrace-based debuggers (C++, Go, Rust): add SYS_PTRACE to cap_add above
     # and uncomment the security_opt below.

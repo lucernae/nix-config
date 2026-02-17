@@ -1,4 +1,8 @@
 { config, pkgs, lib, ... }:
+
+let
+  cfg = config.myConfig.gpgForwarding;
+in
 {
   # Home Manager needs a bit of information about you and the
   # paths it should manage.
@@ -16,13 +20,15 @@
     ./programs/claude-code.nix
   ];
 
-  # Prevent gpg from auto-starting a local gpg-agent;
+  # Prevent gpg from auto-starting a local gpg-agent when receiving forwarded agent;
   # the devcontainer uses a socat bridge to the remote agent instead.
-  programs.gpg.settings.no-autostart = true;
+  programs.gpg.settings.no-autostart = lib.mkDefault cfg.enable;
 
+  # Packages always needed in the devcontainer (independent of feature flag)
+  # These are used by start-gpg-bridge.sh which runs conditionally at runtime
   home.packages = [
     pkgs.docker-client  # Docker CLI (uses host socket)
-    pkgs.tailscale      # Tailscale mesh VPN
+    pkgs.tailscale      # Tailscale mesh VPN (for GPG bridge)
     pkgs.socat          # Required for GPG forwarding bridge
     pkgs.procps         # Provides pgrep/pkill
     pkgs.jq             # JSON processing
