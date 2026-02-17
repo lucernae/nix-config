@@ -59,17 +59,38 @@
             inherit system;
             inherit (nixpkgsConfig) config;
             overlays = [
-              (final: prev: {
-                unstable = import nixpkgs-unstable {
-                  system = prev.stdenv.hostPlatform.system;
-                  inherit (nixpkgsConfig) config;
-                };
-                lima = final.unstable.lima;
-                nix-vscode-extensions = nix-vscode-extensions.extensions.${system};
-                pinentry-box = pinentry-box.packages.${system}.pinentry_box;
-                pinentry-box-cli = pinentry-box.packages.${system}.pinentry_box_cli;
-                # gemini-cli = final.callPackage ./packages/gemini-cli { };
-              })
+              (final: prev:
+                let
+                  isDarwin = builtins.elem system [
+                    "x86_64-darwin"
+                    "aarch64-darwin"
+                  ];
+                in
+                {
+                  unstable = import nixpkgs-unstable {
+                    system = prev.stdenv.hostPlatform.system;
+                    inherit (nixpkgsConfig) config;
+                  };
+                  lima = final.unstable.lima;
+                  nix-vscode-extensions = nix-vscode-extensions.extensions.${system};
+                  pinentry-box = pinentry-box.packages.${system}.pinentry_box;
+                  pinentry-box-cli = pinentry-box.packages.${system}.pinentry_box_cli;
+                  # gemini-cli = final.callPackage ./packages/gemini-cli { };
+                } // (prev.lib.optionalAttrs isDarwin {
+                  # Override inetutils to use 2.6 instead of 2.7 (2.7 fails on Darwin)
+                  inetutils = prev.inetutils.overrideAttrs (oldAttrs: {
+                    version = "2.6";
+                    src = prev.fetchurl {
+                      url = "mirror://gnu/inetutils/inetutils-2.6.tar.xz";
+                      sha256 = "sha256-aL7b/q9z99hr4qfZm8+9QJPYKfUncIk5Ga4XTAsjV8o=";
+                    };
+                    # Remove CVE-2026-24061_2.patch which is for 2.7
+                    patches = builtins.filter (p:
+                      !(prev.lib.hasInfix "CVE-2026-24061" (toString p))
+                    ) (oldAttrs.patches or []);
+                  });
+                })
+              )
             ];
           };
           homeConfigurations = {

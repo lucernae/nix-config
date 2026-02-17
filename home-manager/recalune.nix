@@ -20,6 +20,7 @@
     ./programs/starship.nix
     ./services/gpg-agent.nix
     ./programs/gemini-cli.nix
+    ./programs/claude-code.nix
     ./services/gpg-agent-forwarder.nix
   ];
 

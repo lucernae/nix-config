@@ -7,8 +7,8 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     # for mac setup using nix-darwin
-    darwin.url = "github:lnl7/nix-darwin/master";
-    darwin.inputs.nixpkgs.follows = "nixpkgs-unstable";
+    darwin.url = "github:lnl7/nix-darwin/nix-darwin-25.11";
+    darwin.inputs.nixpkgs.follows = "nixpkgs";
     flake-utils.url = "github:numtide/flake-utils";
     # home manager
     home-manager.url = "github:nix-community/home-manager/release-25.11";
@@ -117,7 +117,20 @@
                 nix-vscode-extensions = nix-vscode-extensions.extensions.${system};
                 pinentry-box = pinentry-box.packages.${system}.pinentry_box;
                 pinentry-box-cli = pinentry-box.packages.${system}.pinentry_box_cli;
-              })
+              } // (optionalAttrs (isDarwin system) {
+                # Override inetutils to use 2.6 instead of 2.7 (2.7 fails on Darwin)
+                inetutils = prev.inetutils.overrideAttrs (oldAttrs: {
+                  version = "2.6";
+                  src = prev.fetchurl {
+                    url = "mirror://gnu/inetutils/inetutils-2.6.tar.xz";
+                    sha256 = "sha256-aL7b/q9z99hr4qfZm8+9QJPYKfUncIk5Ga4XTAsjV8o=";
+                  };
+                  # Remove CVE-2026-24061_2.patch which is for 2.7
+                  patches = builtins.filter (p:
+                    !(prev.lib.hasInfix "CVE-2026-24061" (toString p))
+                  ) (oldAttrs.patches or []);
+                });
+              }))
             ];
           };
 
