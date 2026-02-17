@@ -7,6 +7,7 @@
 # Required env vars:
 #   GPG_FORWARDER_HOST  — Tailscale machine name or IP of the local machine
 #                         running gpg-agent-forwarder (e.g. "red-fenrir" or "100.75.158.34")
+#                         Can be a comma-separated list to try multiple hosts
 #   GPG_FORWARDER_PORT  — TCP port (default: 23456)
 #
 # For GitHub Codespace: set GPG_FORWARDER_HOST and TAILSCALE_AUTH_KEY as Codespace secrets.
@@ -20,7 +21,7 @@ if [ "${ENABLE_GPG_FORWARD:-false}" != "true" ]; then
   exit 0
 fi
 
-LOCAL_MACHINE="${GPG_FORWARDER_HOST:-}"
+GPG_FORWARDER_HOSTS="${GPG_FORWARDER_HOST:-}"
 LOCAL_PORT="${GPG_FORWARDER_PORT:-23456}"
 TS_SOCKET="/var/run/tailscale/tailscaled.sock"
 SOCKS5_PORT="${TAILSCALE_SOCKS5_PORT:-1055}"
@@ -46,6 +47,48 @@ resolve_ts_host() {
   fi
   # Fallback to the original hostname
   echo "$host"
+}
+
+# Check if a Tailscale host is online
+# Returns 0 if online, 1 if offline
+is_ts_host_online() {
+  local host="$1"
+  if command -v tailscale &>/dev/null && [ -S "$TS_SOCKET" ]; then
+    local status
+    status=$(sudo tailscale --socket="$TS_SOCKET" status --json 2>/dev/null \
+      | jq -r --arg name "$host" '.Peer[] | select(.HostName == $name) | .Online // empty' 2>/dev/null \
+      | head -1)
+    if [ "$status" = "true" ]; then
+      return 0
+    fi
+  fi
+  return 1
+}
+
+# Select the first reachable host from comma-separated list
+select_online_host() {
+  local hosts="$1"
+  IFS=',' read -ra HOST_ARRAY <<< "$hosts"
+
+  for host in "${HOST_ARRAY[@]}"; do
+    # Trim whitespace
+    host=$(echo "$host" | xargs)
+    [ -z "$host" ] && continue
+
+    log "Checking if $host is online in Tailscale..."
+    if is_ts_host_online "$host"; then
+      log "$host is online."
+      echo "$host"
+      return 0
+    else
+      log "$host is not online in Tailscale."
+    fi
+  done
+
+  log "No online hosts found in Tailscale. Falling back to first host for direct connection attempt."
+  # Return first host as fallback
+  echo "${HOST_ARRAY[0]}" | xargs
+  return 1
 }
 
 GPG_SOCKET_DIR="$HOME/.gnupg"
@@ -80,9 +123,10 @@ wait_for_tailscale() {
   log "Tailscale not ready after ${retries}s — continuing anyway."
 }
 
-if [ -z "$LOCAL_MACHINE" ]; then
+if [ -z "$GPG_FORWARDER_HOSTS" ]; then
   log "GPG_FORWARDER_HOST not set — skipping GPG bridge."
   log "Set it to your local machine's Tailscale name or Docker host IP."
+  log "You can provide a comma-separated list to try multiple hosts."
   exit 0
 fi
 
@@ -97,6 +141,9 @@ if is_userspace_networking; then
 else
   log "tailscale0 interface present — kernel TUN mode, using direct TCP."
 fi
+
+# Select the first online host from the comma-separated list
+LOCAL_MACHINE=$(select_online_host "$GPG_FORWARDER_HOSTS")
 
 # Resolve Tailscale hostname to IP
 # When using SOCKS5, the proxy handles DNS so an IP isn't strictly required,
