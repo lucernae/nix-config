@@ -28,6 +28,7 @@ in
   # These are used by start-gpg-bridge.sh which runs conditionally at runtime
   home.packages = [
     pkgs.unstable.opencode
+    pkgs.curl
     pkgs.docker-client # Docker CLI (uses host socket)
     pkgs.tailscale # Tailscale mesh VPN (for GPG bridge)
     pkgs.socat # Required for GPG forwarding bridge
