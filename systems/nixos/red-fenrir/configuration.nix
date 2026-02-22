@@ -111,8 +111,24 @@
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
-  # Enable nix profile and flakes
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  # Enable nix profile, flakes, and remote builders
+  nix = {
+    settings = {
+      experimental-features = [ "nix-command" "flakes" ];
+      builders-use-substitutes = true;
+    };
+
+    # Remote builder configuration for ARM builds
+    buildMachines = [{
+      hostName = "nix-linux-builder";
+      systems = [ "aarch64-linux" ];
+      maxJobs = 8;
+      speedFactor = 2;
+      supportedFeatures = [ "big-parallel" "benchmark" "kvm" ];
+      mandatoryFeatures = [ ];
+    }];
+    distributedBuilds = true;
+  };
 
   # Enable nix-ld for running dynamically linked executables (needed for VSCode extensions like Claude Code)
   programs.nix-ld.enable = true;

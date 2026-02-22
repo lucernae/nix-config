@@ -35,7 +35,7 @@
     kdePackages.kgpg
     zoom-us
     kwalletcli
-    google-antigravity
+    antigravity
   ];
 
   home.sessionPath = [

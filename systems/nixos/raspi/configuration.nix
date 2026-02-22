@@ -68,6 +68,7 @@
     helm
     iptables
     openvpn
+    htop
 
     # Remote desktop solutions
     wayvnc # VNC server for Wayland\
@@ -82,7 +83,7 @@
     xorg.libXrandr
     xorg.libXi
     xorg.libX11 # X11 libs needed by Niri via winit
-    alacritty
+    ghostty
     fuzzel
     waybar
     mako
@@ -267,6 +268,15 @@
     # This is my public key
     "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDqlXJv/noNPmZMIfjJguRX3O+Z39xeoKhjoIBEyfeqgKGh9JOv7IDBWlNnd3rHVnVPzB9emiiEoAJpkJUnWNBidL6vPYn13r6Zrt/2WLT6TiUFU026ANdqMjIMEZrmlTsfzFT+OzpBqtByYOGGe19qD3x/29nbszPODVF2giwbZNIMo2x7Ww96U4agb2aSAwo/oQa4jQsnOpYRMyJQqCUhvX8LzvE9vFquLlrSyd8khUsEVV/CytmdKwUUSqmlo/Mn7ge/S12rqMwmLvWFMd08Rg9NHvRCeOjgKB4EI6bVwF8D6tNFnbsGVzTHl7Cosnn75U11CXfQ6+8MPq3cekYr lucernae@lombardia-N43SM"
   ];
+
+  fonts.fontDir.enable = true;
+
+  fonts.packages = with pkgs; [
+    jetbrains-mono
+    nerd-fonts.fira-code
+    nerd-fonts.droid-sans-mono
+  ];
+
   system.stateVersion = "23.05";
 
 
@@ -300,14 +310,51 @@
     };
   };
 
+  # Import Wayland environment variables for systemd user services
+  systemd.user.services.import-wayland-env = {
+    description = "Import Wayland environment to systemd";
+    wantedBy = [ "graphical-session.target" ];
+    after = [ "graphical-session.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = "${pkgs.writeShellScript "import-wayland-env" ''
+        # Wait for Wayland socket
+        for i in {1..20}; do
+          if [ -S "$XDG_RUNTIME_DIR/wayland-0" ] || [ -S "$XDG_RUNTIME_DIR/wayland-1" ]; then
+            # Socket found, export to systemd
+            if [ -z "$WAYLAND_DISPLAY" ]; then
+              # Try to detect socket name
+              for socket in wayland-0 wayland-1; do
+                if [ -S "$XDG_RUNTIME_DIR/$socket" ]; then
+                  export WAYLAND_DISPLAY=$socket
+                  break
+                fi
+              done
+            fi
+            systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
+            ${pkgs.dbus}/bin/dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
+            exit 0
+          fi
+          sleep 0.5
+        done
+        echo "Wayland socket not found after 10 seconds"
+        exit 1
+      ''}";
+    };
+  };
+
   systemd.user.services.wayvnc = {
     description = "WayVNC - VNC server for Wayland";
     wantedBy = [ "graphical-session.target" ];
-    after = [ "graphical-session.target" ];
+    after = [ "graphical-session.target" "import-wayland-env.service" ];
+    requires = [ "import-wayland-env.service" ];
+    partOf = [ "graphical-session.target" ];
     serviceConfig = {
       Type = "simple";
       ExecStart = "${pkgs.wayvnc}/bin/wayvnc -o HDMI-A-1 -L trace 0.0.0.0 5900";
       Restart = "on-failure";
+      RestartSec = "2s";
     };
   };
 }

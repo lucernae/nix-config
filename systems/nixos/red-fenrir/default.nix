@@ -7,7 +7,8 @@
   ];
 
   nix = {
-    distributedBuilds = false;
+    distributedBuilds = true;
+    settings.builders-use-substitutes = true;
     settings.trusted-users = [
       "@admin"
       "@wheel"
@@ -22,6 +23,16 @@
       "nix-command"
       "flakes"
     ];
+
+    # Remote builder configuration for ARM builds
+    buildMachines = [{
+      hostName = "nix-linux-builder";
+      systems = [ "aarch64-linux" ];
+      maxJobs = 8;
+      speedFactor = 2;
+      supportedFeatures = [ "big-parallel" "benchmark" "kvm" ];
+      mandatoryFeatures = [ ];
+    }];
   };
 
   # Bootloader.

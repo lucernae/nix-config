@@ -126,9 +126,11 @@
                     sha256 = "sha256-aL7b/q9z99hr4qfZm8+9QJPYKfUncIk5Ga4XTAsjV8o=";
                   };
                   # Remove CVE-2026-24061_2.patch which is for 2.7
-                  patches = builtins.filter (p:
-                    !(prev.lib.hasInfix "CVE-2026-24061" (toString p))
-                  ) (oldAttrs.patches or []);
+                  patches = builtins.filter
+                    (p:
+                      !(prev.lib.hasInfix "CVE-2026-24061" (toString p))
+                    )
+                    (oldAttrs.patches or [ ]);
                 });
               }))
             ];
