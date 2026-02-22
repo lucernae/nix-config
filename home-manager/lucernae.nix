@@ -33,7 +33,9 @@
     pcsx2
     devcontainer
     kdePackages.kgpg
+    zoom-us
     kwalletcli
+    google-antigravity
   ];
 
   home.sessionPath = [

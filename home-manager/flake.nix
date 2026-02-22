@@ -23,6 +23,11 @@
       url = "github:vicinaehq/extensions";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Google Antigravity
+    antigravity-nix = {
+      url = "github:jacopone/antigravity-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -36,6 +41,7 @@
     , nixpkgs-unstable
     , vicinae
     , vicinae-extensions
+    , antigravity-nix
     , ...
     }:
     let
@@ -75,7 +81,7 @@
                   nix-vscode-extensions = nix-vscode-extensions.extensions.${system};
                   pinentry-box = pinentry-box.packages.${system}.pinentry_box;
                   pinentry-box-cli = pinentry-box.packages.${system}.pinentry_box_cli;
-                  # gemini-cli = final.callPackage ./packages/gemini-cli { };
+                # gemini-cli = final.callPackage ./packages/gemini-cli { };
                 } // (prev.lib.optionalAttrs isDarwin {
                   # Override inetutils to use 2.6 instead of 2.7 (2.7 fails on Darwin)
                   inetutils = prev.inetutils.overrideAttrs (oldAttrs: {
