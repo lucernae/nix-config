@@ -1,0 +1,93 @@
+name: Build Nix Flake and Push to Cache
+
+on:
+  workflow_dispatch:
+    inputs:
+      flake_ref:
+        description: 'Flake reference (e.g., .#package, github:user/repo#package, ./path/to/flake#output)'
+        required: true
+        type: string
+        default: './process-compose/llm/qwen-3-5#llm'
+      branch:
+        description: 'Branch to checkout (leave empty for default branch or when using remote flake)'
+        required: false
+        type: string
+        default: ''
+
+jobs:
+  build-and-cache:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        if: ${{ !startsWith(inputs.flake_ref, 'github:') && !startsWith(inputs.flake_ref, 'git+https://') }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.branch || github.ref }}
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+        with:
+          extra-conf: |
+            experimental-features = nix-command flakes
+            substituters = https://cache.nixos.org https://nix-community.cachix.org ${{ secrets.NIX_CACHE_URL }}
+            trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs= ${{ secrets.NIX_CACHE_PUBLIC_KEY }}
+            allow-import-from-derivation = true
+
+      - name: Setup Magic Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - name: Configure SSH for cache push
+        run: |
+          # Extract hostname from cache URL
+          CACHE_HOST=$(echo "${{ secrets.NIX_CACHE_URL }}" | sed -E 's|^https?://||' | sed -E 's|^ssh://[^@]+@||' | cut -d'/' -f1)
+
+          mkdir -p ~/.ssh
+          echo "${{ secrets.NIX_CACHE_SSH_KEY }}" > ~/.ssh/nix_cache_key
+          chmod 600 ~/.ssh/nix_cache_key
+          ssh-keyscan -H "$CACHE_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+
+          cat >> ~/.ssh/config <<EOF
+          Host $CACHE_HOST
+            HostName $CACHE_HOST
+            User root
+            IdentityFile ~/.ssh/nix_cache_key
+            StrictHostKeyChecking accept-new
+          EOF
+
+      - name: Build Nix flake
+        run: |
+          echo "Building flake: ${{ inputs.flake_ref }}"
+          nix build "${{ inputs.flake_ref }}" --print-build-logs
+
+      - name: Push to Nix cache
+        run: |
+          # Extract hostname from cache URL for SSH
+          CACHE_HOST=$(echo "${{ secrets.NIX_CACHE_URL }}" | sed -E 's|^https?://||' | sed -E 's|^ssh://[^@]+@||' | cut -d'/' -f1)
+
+          # Get all runtime dependencies of the built package
+          STORE_PATHS=$(nix path-info --recursive ./result)
+
+          # Copy to cache
+          echo "Copying to cache at ssh://root@$CACHE_HOST"
+          echo "Store paths:"
+          echo "$STORE_PATHS"
+          nix copy --to "ssh://root@$CACHE_HOST" $STORE_PATHS
+
+      - name: Report build info
+        if: always()
+        run: |
+          if [ -L result ]; then
+            echo "### Build successful! :rocket:" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Flake reference:** \`${{ inputs.flake_ref }}\`" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Store path:** \`$(readlink -f result)\`" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Dependencies cached:**" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            nix path-info --recursive ./result | head -20 >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### Build failed :x:" >> $GITHUB_STEP_SUMMARY
+          fi
