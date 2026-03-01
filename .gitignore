@@ -7,7 +7,12 @@ result
 .devcontainer
 .direnv
 .devshell
+.local.envrc
 
 *.pem
 
 output
+
+# npm local global packages
+.npm-global
+node_modules
