@@ -1,5 +1,5 @@
 {
-  description = "Flake to run Llama.cpp with process-compose and include Qwen 3.5 models with optional GPU support on Linux";
+  description = "Flake to run Qwen 3.5 models using either Ollama or Llama.cpp with process-compose, with optional GPU support";
 
   inputs = {
     # Required inputs
@@ -64,12 +64,10 @@
             '';
           });
 
-          # Conditional GPU support for Linux
-          # Ollama already has built-in GPU support (CUDA/ROCm)
-          # The base ollama package will automatically detect and use available GPUs
+          # Ollama with GPU support
+          # The base ollama package (v0.17.4) has built-in GPU support (CUDA/ROCm)
+          # and will automatically detect and use available GPUs
           ollamaWithGpu = ollamaBase;
-          # Conditional GPU support for Linux
-          # ollamaWithGpu = pkgs.ollama-vulkan;
 
           # Model configuration parameters
           # These can be overridden via environment variables
@@ -103,7 +101,7 @@
         rec {
 
 
-          # Setup process-compose for Ollama service with DeepSeek model
+          # Setup process-compose for running Qwen 3.5 with either Ollama or llama.cpp
           process-compose."llm" =
             {
               cli = {

@@ -7,12 +7,22 @@ on:
         description: 'Flake reference (e.g., .#package, github:user/repo#package, ./path/to/flake#output)'
         required: true
         type: string
-        default: './process-compose/llm/qwen-3-5#llm'
+        default: '.'
       branch:
         description: 'Branch to checkout (leave empty for default branch or when using remote flake)'
         required: false
         type: string
         default: ''
+      allow_unfree:
+        description: 'Allow unfree packages (NIXPKGS_ALLOW_UNFREE)'
+        required: false
+        type: boolean
+        default: false
+      impure:
+        description: 'Build with --impure flag'
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   build-and-cache:
@@ -56,9 +66,20 @@ jobs:
           EOF
 
       - name: Build Nix flake
+        env:
+          NIXPKGS_ALLOW_UNFREE: ${{ inputs.allow_unfree && '1' || '0' }}
+          NIXPKGS_ALLOW_INSECURE: ${{ inputs.allow_unfree && '1' || '0' }}
         run: |
           echo "Building flake: ${{ inputs.flake_ref }}"
-          nix build "${{ inputs.flake_ref }}" --print-build-logs
+          IMPURE_FLAG=""
+          if [ "${{ inputs.impure }}" = "true" ]; then
+            IMPURE_FLAG="--impure"
+            echo "Building with --impure flag"
+          fi
+          if [ "${{ inputs.allow_unfree }}" = "true" ]; then
+            echo "Building with NIXPKGS_ALLOW_UNFREE=1 and NIXPKGS_ALLOW_INSECURE=1"
+          fi
+          nix build "${{ inputs.flake_ref }}" --print-build-logs $IMPURE_FLAG
 
       - name: Push to Nix cache
         run: |
