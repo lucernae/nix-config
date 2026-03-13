@@ -16,3 +16,10 @@ output
 # npm local global packages
 .npm-global
 node_modules
+
+# WireGuard sensitive files
+*.conf
+**/wireguard-settings.ini
+
+# WireGuard configuration (contains private key)
+systems/nixos/red-fenrir/pvdata.conf

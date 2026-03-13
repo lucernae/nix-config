@@ -4,6 +4,7 @@
     ./hardware-configuration.nix
   ] ++ [
     ./gaming.nix
+    ./wireguard.nix
   ];
 
   nix = {
@@ -69,6 +70,7 @@
     enable = true;
     # Use systemd-resolved for DNS
     dns = "systemd-resolved";
+    # WireGuard support is built-in to NetworkManager 1.16+
   };
 
   # Configure NetworkManager to ignore DHCP DNS
@@ -166,6 +168,7 @@
     kdePackages.kwallet-pam
     kdePackages.ksshaskpass
     fastfetch
+    wireguard-tools # WireGuard utilities (wg, wg-quick)
 
     # Network diagnostic tools
     bind # dig, nslookup, host - DNS lookup tools
