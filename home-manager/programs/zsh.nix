@@ -7,6 +7,12 @@
       autoload -Uz compinit && compinit -i
     '';
     initContent = lib.mkMerge [
+      (lib.mkBefore ''
+        # Kiro CLI pre block. Keep at the top of this file.
+        [[ -f "''${HOME}/Library/Application Support/kiro-cli/shell/zshrc.pre.zsh" ]] && builtin source "''${HOME}/Library/Application Support/kiro-cli/shell/zshrc.pre.zsh"
+
+        [[ "$TERM_PROGRAM" == "kiro" ]] && . "$(kiro --locate-shell-integration-path zsh)"
+      '')
       (lib.mkOrder 550 ''
         ZSH_DISABLE_COMPFIX=true
       '')
@@ -57,6 +63,19 @@
 
         # Set SSH_AUTH_SOCK to use gpg-agent (enables KWallet integration)
         export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
+
+        # Sourcing custom scripts
+        source ~/.scripts/zsh/*.sh
+
+        # Run Tailscale GPG connector script for Codespaces
+        if [[ -n "$CODESPACES" ]] && [[ ~/.scripts/tailscale-gpg-connector.sh ]]; then
+          ~/.scripts/tailscale-gpg-connector.sh
+        fi
+      '')
+      
+      (lib.mkAfter ''
+        # Kiro CLI post block. Keep at the bottom of this file.
+        [[ -f "''${HOME}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh" ]] && builtin source "''${HOME}/Library/Application Support/kiro-cli/shell/zshrc.post.zsh"
       '')
     ];
     oh-my-zsh = {

@@ -93,6 +93,10 @@
 
       # apply skhd config
       ctrl + alt - r : launchctl stop org.nixos.skhd; launchctl start org.nixos.skhd;
+
+      .blacklist [
+        "Dota 2"
+      ]
     '';
   };
 }
