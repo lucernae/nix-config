@@ -2,6 +2,7 @@
 # Location: ~/.claude/statusline.yaml (symlinked from nix-config)
 
 box: true
+direction: ltr   # ltr or rtl
 
 sparkles:
   enabled: true

@@ -15,6 +15,7 @@ DEFAULTS = {
         'chars':  ['✦', '✧', '⋆', '·'],
         'colors': ['yellow', 'white', 'cyan', 'magenta'],
     },
+    'direction': 'ltr',
     'lines':  ['session', 'starship', 'stats'],
     'icons': {
         'session':  '🧵',
@@ -72,6 +73,7 @@ def c(name):
 
 col = cfg['colors']
 ico = cfg['icons']
+rtl = cfg.get('direction', 'ltr') == 'rtl'
 
 # ── Text helpers ───────────────────────────────────────────────────────────────
 
@@ -116,7 +118,7 @@ def sparkle_pad(n, seed):
 
 # ── Line rendering ─────────────────────────────────────────────────────────────
 
-def ansi_trunc_pad(s, limit, seed=None):
+def ansi_trunc_pad(s, limit, seed=None, rtl=False):
     result, vis, i = [], 0, 0
     while i < len(s):
         if s[i] == '\033' and i + 1 < len(s) and s[i+1] == '[':
@@ -132,7 +134,8 @@ def ansi_trunc_pad(s, limit, seed=None):
                 vis += w
             i += 1
     pad = sparkle_pad(limit - vis, seed) if seed is not None else ' ' * (limit - vis)
-    return ''.join(result) + RST + pad
+    content = ''.join(result) + RST
+    return pad + content if rtl else content + pad
 
 def format_duration(ms):
     if ms is None:
@@ -190,15 +193,25 @@ if ' via ' in raw:
 else:
     s_main, s_via = raw, ''
 
-wt_tag = f'[worktree: {wt}] ' if wt else ''
+wt_tag = f'[worktree: {wt}]' if wt else ''
 if sname:
-    # 🧵(2) + space(1) + " · "(3) + sid(8) = 14 cols fixed
-    name_budget   = inner - display_width(wt_tag) - 14
+    # icon(2) + space(1) + " · "(3) + sid(8) = 14 cols fixed
+    wt_w          = display_width(wt_tag) + (1 if wt_tag else 0)
+    name_budget   = inner - wt_w - 14
     sname_display = trunc_text(sname, max(1, name_budget))
-    session = (f'{ico["session"]} {c(col["session_name"])}{sname_display}{RST}'
-               f' · {c(col["session_id"])}{sid}{RST}')
+    if rtl:
+        session = (f'{c(col["session_id"])}{sid}{RST}'
+                   f' · {c(col["session_name"])}{sname_display}{RST}'
+                   f' {ico["session"]}' + (f' {wt_tag}' if wt_tag else ''))
+    else:
+        session = ((f'{wt_tag} ' if wt_tag else '') +
+                   f'{ico["session"]} {c(col["session_name"])}{sname_display}{RST}'
+                   f' · {c(col["session_id"])}{sid}{RST}')
 else:
-    session = f'{ico["session"]} {c(col["session_id"])}{sid}{RST}'
+    if rtl:
+        session = f'{c(col["session_id"])}{sid}{RST} {ico["session"]}' + (f' {wt_tag}' if wt_tag else '')
+    else:
+        session = (f'{wt_tag} ' if wt_tag else '') + f'{ico["session"]} {c(col["session_id"])}{sid}{RST}'
 
 cost_s = f'${cost:.4f}' if cost is not None else '$-'
 dur_s  = format_duration(dur)
@@ -208,12 +221,24 @@ if pct is not None:
     ctx_s  = f'[{bar}] {pct:.0f}%'
 else:
     ctx_s = '[░░░░░░░░░░] -%'
-suffix_s     = (f' {ico["cost"]} {c(col["cost"])}{cost_s}{RST}'
-                f' {ico["duration"]} {c(col["duration"])}{dur_s}{RST}'
-                f' {ico["context"]} {c(col["context"])}{ctx_s}{RST}')
-model_budget = max(1, inner - display_width(ico["model"]) - 1 - display_width(suffix_s))
+
+# Stats elements: (icon, value, color_key) — reversed in RTL
+stat_elems = [
+    (ico['model'],    None,   col['model']),   # model filled below after budget calc
+    (ico['cost'],     cost_s, col['cost']),
+    (ico['duration'], dur_s,  col['duration']),
+    (ico['context'],  ctx_s,  col['context']),
+]
+fixed_w = sum(display_width(f' {i} {v}') for i, v, _ in stat_elems[1:])
+model_budget = max(1, inner - display_width(ico['model']) - 1 - fixed_w)
 model_disp   = trunc_text(model, model_budget)
-stats        = f'{ico["model"]} {c(col["model"])}{model_disp}{RST}{suffix_s}'
+stat_elems[0] = (ico['model'], model_disp, col['model'])
+
+if rtl:
+    parts = [f'{c(col)}{val}{RST} {icon}' for icon, val, col in reversed(stat_elems)]
+else:
+    parts = [f'{icon} {c(col)}{val}{RST}' for icon, val, col in stat_elems]
+stats = ' '.join(parts)
 
 # ── Assemble lines in configured order ────────────────────────────────────────
 
@@ -231,10 +256,12 @@ for line_type in cfg['lines']:
 
 if cfg['box']:
     border = '─' * inner
-    print('┌' + border + '┐')
+    tl, tr = ('┐', '┌') if rtl else ('┌', '┐')
+    bl, br = ('┘', '└') if rtl else ('└', '┘')
+    print(tl + border + tr)
     for idx, line in enumerate(output_lines):
-        print('│' + ansi_trunc_pad(line, inner, seed=(tick, idx)) + '│')
-    print('└' + border + '┘')
+        print('│' + ansi_trunc_pad(line, inner, seed=(tick, idx), rtl=rtl) + '│')
+    print(bl + border + br)
 else:
     for idx, line in enumerate(output_lines):
-        print(ansi_trunc_pad(line, inner, seed=(tick, idx)))
+        print(ansi_trunc_pad(line, inner, seed=(tick, idx), rtl=rtl))
