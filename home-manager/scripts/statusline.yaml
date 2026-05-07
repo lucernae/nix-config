@@ -20,4 +20,5 @@ colors:
   session_id:   orange
   model:        bright_blue
   cost:         bright_green
+  duration:     bright_cyan
   context:      bright_yellow

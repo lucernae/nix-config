@@ -21,6 +21,7 @@ DEFAULTS = {
         'session_id':   'orange',
         'model':        'bright_blue',
         'cost':         'bright_green',
+        'duration':     'bright_cyan',
         'context':      'bright_yellow',
     },
 }
@@ -125,6 +126,21 @@ def ansi_trunc_pad(s, limit, seed=None):
     pad = sparkle_pad(limit - vis, seed) if seed is not None else ' ' * (limit - vis)
     return ''.join(result) + RST + pad
 
+def format_duration(ms):
+    if ms is None:
+        return '-'
+    ms = int(ms)
+    if ms < 1000:
+        return f'{ms}ms'
+    s = ms // 1000
+    if s < 60:
+        return f'{s}s'
+    m, s = divmod(s, 60)
+    if m < 60:
+        return f'{m}m {s}s'
+    h, m = divmod(m, 60)
+    return f'{h}h {m}m'
+
 # ── Starship ───────────────────────────────────────────────────────────────────
 
 def starship(path, width=80):
@@ -151,6 +167,7 @@ sid   = data.get('session_id', '')[:8]
 pct   = data.get('context_window', {}).get('used_percentage')
 model = data.get('model', {}).get('display_name', '-')
 cost  = data.get('cost', {}).get('total_cost_usd')
+dur   = data.get('cost', {}).get('total_duration_ms')
 
 width = term_width()
 inner = max(2, width - 2)
@@ -176,13 +193,16 @@ else:
     session = f'🧵 {c(col["session_id"])}{sid}{RST}'
 
 cost_s = f'${cost:.4f}' if cost is not None else '$-'
+dur_s  = format_duration(dur)
 if pct is not None:
     filled = round(pct / 10)
     bar    = '█' * filled + '░' * (10 - filled)
     ctx_s  = f'[{bar}] {pct:.0f}%'
 else:
     ctx_s = '[░░░░░░░░░░] -%'
-suffix_s     = f' 💸 {c(col["cost"])}{cost_s}{RST} 📊 {c(col["context"])}{ctx_s}{RST}'
+suffix_s     = (f' 💸 {c(col["cost"])}{cost_s}{RST}'
+                f' ⏱ {c(col["duration"])}{dur_s}{RST}'
+                f' 📊 {c(col["context"])}{ctx_s}{RST}')
 model_budget = max(1, inner - 3 - display_width(suffix_s))
 model_disp   = trunc_text(model, model_budget)
 stats        = f'🧠 {c(col["model"])}{model_disp}{RST}{suffix_s}'
