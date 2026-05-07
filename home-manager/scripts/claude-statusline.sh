@@ -18,11 +18,13 @@ DEFAULTS = {
     'direction': 'ltr',
     'lines':  ['session', 'starship', 'stats'],
     'icons': {
-        'session':  '🧵',
-        'model':    '🧠',
-        'cost':     '💸',
-        'duration': '⏱',
-        'context':  '📊',
+        'session':   '🧵',
+        'model':     '🧠',
+        'cost':      '💸',
+        'duration':  '⏱',
+        'context':   '📊',
+        'directory': '📂',
+        'branch':    '🌿',
     },
     'colors': {
         'session_name': 'bright_blue',
@@ -31,6 +33,8 @@ DEFAULTS = {
         'cost':         'bright_green',
         'duration':     'bright_cyan',
         'context':      'bright_yellow',
+        'directory':    'bright_cyan',
+        'branch':       'bright_magenta',
     },
 }
 
@@ -167,6 +171,24 @@ def starship(path, width=80):
     except Exception:
         return ''
 
+def build_dir_line(cdir):
+    home = os.path.expanduser('~')
+    short = cdir.replace(home, '~') if cdir.startswith(home) else cdir
+    branch = ''
+    try:
+        r = subprocess.run(
+            ['git', '-C', cdir, 'branch', '--show-current'],
+            capture_output=True, text=True, timeout=2
+        )
+        if r.returncode == 0:
+            branch = r.stdout.strip()
+    except Exception:
+        pass
+    line = f'{ico["directory"]} {c(col["directory"])}{short}{RST}'
+    if branch:
+        line += f' on {ico["branch"]} {c(col["branch"])}{branch}{RST}'
+    return line
+
 # ── Data ───────────────────────────────────────────────────────────────────────
 
 data  = json.load(sys.stdin)
@@ -187,11 +209,16 @@ tick  = int(time.time())
 # ── Build sections ─────────────────────────────────────────────────────────────
 
 raw = starship(cdir, width) if cdir else ''
-if ' via ' in raw:
-    idx = raw.index(' via ')
-    s_main, s_via = raw[:idx], 'via ' + raw[idx+5:]
+if raw:
+    if ' via ' in raw:
+        idx = raw.index(' via ')
+        starship_lines = [raw[:idx], 'via ' + raw[idx+5:]]
+    else:
+        starship_lines = [raw]
+elif cdir:
+    starship_lines = [build_dir_line(cdir)]
 else:
-    s_main, s_via = raw, ''
+    starship_lines = []
 
 wt_tag = f'[worktree: {wt}]' if wt else ''
 if sname:
@@ -247,8 +274,7 @@ for line_type in cfg['lines']:
     if line_type == 'session':
         output_lines.append(wt_tag + session)
     elif line_type == 'starship':
-        if s_main: output_lines.append(s_main)
-        if s_via:  output_lines.append(s_via)
+        output_lines.extend(starship_lines)
     elif line_type == 'stats':
         output_lines.append(stats)
 

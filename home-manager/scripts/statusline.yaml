@@ -11,11 +11,13 @@ sparkles:
   colors: [yellow, white, cyan, magenta]
 
 icons:
-  session:  "🧵"
-  model:    "🧠"
-  cost:     "💸"
-  duration: "⏱"
-  context:  "📊"
+  session:   "🧵"
+  model:     "🧠"
+  cost:      "💸"
+  duration:  "⏱"
+  context:   "📊"
+  directory: "📂"
+  branch:    "🌿"
 
 # Line order — available types: session, starship, stats
 lines:
@@ -30,3 +32,5 @@ colors:
   cost:         bright_green
   duration:     bright_cyan
   context:      bright_yellow
+  directory:    bright_cyan
+  branch:       bright_magenta
