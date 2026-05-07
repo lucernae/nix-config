@@ -9,6 +9,13 @@ sparkles:
   chars: ["✦", "✧", "⋆", "·"]
   colors: [yellow, white, cyan, magenta]
 
+icons:
+  session:  "🧵"
+  model:    "🧠"
+  cost:     "💸"
+  duration: "⏱"
+  context:  "📊"
+
 # Line order — available types: session, starship, stats
 lines:
   - session

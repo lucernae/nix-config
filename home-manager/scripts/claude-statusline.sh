@@ -16,6 +16,13 @@ DEFAULTS = {
         'colors': ['yellow', 'white', 'cyan', 'magenta'],
     },
     'lines':  ['session', 'starship', 'stats'],
+    'icons': {
+        'session':  '🧵',
+        'model':    '🧠',
+        'cost':     '💸',
+        'duration': '⏱',
+        'context':  '📊',
+    },
     'colors': {
         'session_name': 'bright_blue',
         'session_id':   'orange',
@@ -64,6 +71,7 @@ def c(name):
     return ANSI.get(name, '')
 
 col = cfg['colors']
+ico = cfg['icons']
 
 # ── Text helpers ───────────────────────────────────────────────────────────────
 
@@ -187,10 +195,10 @@ if sname:
     # 🧵(2) + space(1) + " · "(3) + sid(8) = 14 cols fixed
     name_budget   = inner - display_width(wt_tag) - 14
     sname_display = trunc_text(sname, max(1, name_budget))
-    session = (f'🧵 {c(col["session_name"])}{sname_display}{RST}'
+    session = (f'{ico["session"]} {c(col["session_name"])}{sname_display}{RST}'
                f' · {c(col["session_id"])}{sid}{RST}')
 else:
-    session = f'🧵 {c(col["session_id"])}{sid}{RST}'
+    session = f'{ico["session"]} {c(col["session_id"])}{sid}{RST}'
 
 cost_s = f'${cost:.4f}' if cost is not None else '$-'
 dur_s  = format_duration(dur)
@@ -200,12 +208,12 @@ if pct is not None:
     ctx_s  = f'[{bar}] {pct:.0f}%'
 else:
     ctx_s = '[░░░░░░░░░░] -%'
-suffix_s     = (f' 💸 {c(col["cost"])}{cost_s}{RST}'
-                f' ⏱ {c(col["duration"])}{dur_s}{RST}'
-                f' 📊 {c(col["context"])}{ctx_s}{RST}')
-model_budget = max(1, inner - 3 - display_width(suffix_s))
+suffix_s     = (f' {ico["cost"]} {c(col["cost"])}{cost_s}{RST}'
+                f' {ico["duration"]} {c(col["duration"])}{dur_s}{RST}'
+                f' {ico["context"]} {c(col["context"])}{ctx_s}{RST}')
+model_budget = max(1, inner - display_width(ico["model"]) - 1 - display_width(suffix_s))
 model_disp   = trunc_text(model, model_budget)
-stats        = f'🧠 {c(col["model"])}{model_disp}{RST}{suffix_s}'
+stats        = f'{ico["model"]} {c(col["model"])}{model_disp}{RST}{suffix_s}'
 
 # ── Assemble lines in configured order ────────────────────────────────────────
 
