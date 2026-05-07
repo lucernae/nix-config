@@ -1,14 +1,76 @@
 #!/run/current-system/sw/bin/nix-shell
-#!nix-shell -i python3 -p python3 git starship
-import json, os, re, shutil, subprocess, sys, time, unicodedata
+#!nix-shell -i python3 -p python3 python3Packages.pyyaml git starship
+import json, os, random, re, shutil, subprocess, sys, time, unicodedata
+import yaml
+
+# ── Config ────────────────────────────────────────────────────────────────────
+
+CONFIG_PATH = os.path.expanduser('~/.claude/statusline.yaml')
+
+DEFAULTS = {
+    'box': True,
+    'sparkles': {
+        'enabled': True,
+        'density': 8,
+        'chars':  ['✦', '✧', '⋆', '·'],
+        'colors': ['yellow', 'white', 'cyan', 'magenta'],
+    },
+    'lines':  ['session', 'starship', 'stats'],
+    'colors': {
+        'session_name': 'bright_blue',
+        'session_id':   'orange',
+        'model':        'bright_blue',
+        'cost':         'bright_green',
+        'context':      'bright_yellow',
+    },
+}
+
+def load_config():
+    try:
+        with open(CONFIG_PATH) as f:
+            user = yaml.safe_load(f) or {}
+    except FileNotFoundError:
+        user = {}
+    cfg = dict(DEFAULTS)
+    for k, v in user.items():
+        if isinstance(v, dict) and isinstance(cfg.get(k), dict):
+            cfg[k] = {**cfg[k], **v}
+        else:
+            cfg[k] = v
+    return cfg
+
+cfg = load_config()
+
+# ── Color map ─────────────────────────────────────────────────────────────────
+
+ANSI = {
+    'bright_blue':    '\033[94m',
+    'bright_green':   '\033[92m',
+    'bright_yellow':  '\033[93m',
+    'bright_cyan':    '\033[96m',
+    'bright_magenta': '\033[95m',
+    'bright_white':   '\033[97m',
+    'bright_red':     '\033[91m',
+    'orange':         '\033[38;5;208m',
+    'blue':           '\033[34m',  'green':   '\033[32m',
+    'yellow':         '\033[33m',  'cyan':    '\033[36m',
+    'magenta':        '\033[35m',  'white':   '\033[37m',
+    'red':            '\033[31m',  'dim':     '\033[2m',
+}
+RST = '\033[0m'
+
+def c(name):
+    return ANSI.get(name, '')
+
+col = cfg['colors']
+
+# ── Text helpers ───────────────────────────────────────────────────────────────
 
 def term_width():
-    # Prefer COLUMNS env var (set by shell), then tput, then fall back to 80
     cols = os.environ.get('COLUMNS')
     if cols and cols.isdigit():
         return int(cols)
-    size = shutil.get_terminal_size(fallback=(80, 24))
-    return size.columns
+    return shutil.get_terminal_size(fallback=(80, 24)).columns
 
 ANSI_RE = re.compile(r'\033\[[0-9;]*m')
 
@@ -18,7 +80,34 @@ def display_width(s):
         w += 2 if unicodedata.east_asian_width(ch) in ('W', 'F') else 1
     return w
 
-def ansi_trunc(s, limit=80):
+def trunc_text(s, limit):
+    w = 0
+    for i, ch in enumerate(s):
+        cw = 2 if unicodedata.east_asian_width(ch) in ('W', 'F') else 1
+        if w + cw > limit:
+            return s[:i].rstrip() + '…'
+        w += cw
+    return s
+
+# ── Sparkles ───────────────────────────────────────────────────────────────────
+
+sp_cfg    = cfg['sparkles']
+SP_CHARS  = sp_cfg['chars']
+SP_COLORS = [ANSI.get(n, RST) for n in sp_cfg['colors']]
+
+def sparkle_pad(n, seed):
+    if n <= 0 or not sp_cfg['enabled']:
+        return ' ' * n
+    rng   = random.Random(hash(seed))
+    cells = [' '] * n
+    count = max(1, n // sp_cfg['density'])
+    for pos in rng.sample(range(n), min(count, n)):
+        cells[pos] = f'{rng.choice(SP_COLORS)}{rng.choice(SP_CHARS)}{RST}'
+    return ''.join(cells)
+
+# ── Line rendering ─────────────────────────────────────────────────────────────
+
+def ansi_trunc_pad(s, limit, seed=None):
     result, vis, i = [], 0, 0
     while i < len(s):
         if s[i] == '\033' and i + 1 < len(s) and s[i+1] == '[':
@@ -33,54 +122,10 @@ def ansi_trunc(s, limit=80):
                 result.append(s[i])
                 vis += w
             i += 1
-    return ''.join(result) + '\033[0m'
+    pad = sparkle_pad(limit - vis, seed) if seed is not None else ' ' * (limit - vis)
+    return ''.join(result) + RST + pad
 
-def ansi_trunc_pad(s, limit):
-    """Truncate to limit visible cols, pad with spaces to exactly limit cols."""
-    result, vis, i = [], 0, 0
-    while i < len(s):
-        if s[i] == '\033' and i + 1 < len(s) and s[i+1] == '[':
-            j = i + 2
-            while j < len(s) and not s[j].isalpha():
-                j += 1
-            result.append(s[i:j+1])
-            i = j + 1
-        else:
-            w = 2 if unicodedata.east_asian_width(s[i]) in ('W', 'F') else 1
-            if vis + w <= limit:
-                result.append(s[i])
-                vis += w
-            i += 1
-    return ''.join(result) + '\033[0m' + ' ' * (limit - vis)
-
-def ansi_slice(s, start_col, num_cols):
-    """Extract visible columns [start_col, start_col+num_cols) preserving ANSI state."""
-    result, vis, end_col, i = [], 0, start_col + num_cols, 0
-    while i < len(s):
-        if s[i] == '\033' and i + 1 < len(s) and s[i+1] == '[':
-            j = i + 2
-            while j < len(s) and not s[j].isalpha():
-                j += 1
-            result.append(s[i:j+1])
-            i = j + 1
-        else:
-            w = 2 if unicodedata.east_asian_width(s[i]) in ('W', 'F') else 1
-            if start_col <= vis < end_col:
-                result.append(s[i])
-            vis += w
-            i += 1
-            if vis >= end_col:
-                break
-    return ''.join(result) + '\033[0m'
-
-def marquee(text, budget, now):
-    """Scroll text left-to-right if it overflows budget, pause 3s at end, reset."""
-    full_w = display_width(text)
-    if full_w <= budget:
-        return text
-    scroll_dist = full_w - budget
-    offset = min(int(now) % (scroll_dist + 3), scroll_dist)
-    return ansi_slice(text, offset, budget)
+# ── Starship ───────────────────────────────────────────────────────────────────
 
 def starship(path, width=80):
     try:
@@ -95,21 +140,24 @@ def starship(path, width=80):
     except Exception:
         return ''
 
-data    = json.load(sys.stdin)
-ws      = data.get('workspace', {})
-cdir    = ws.get('current_dir', '')
-wt      = ws.get('git_worktree', '')
-sname   = data.get('session_name', '')
-sid     = data.get('session_id', '')[:8]
-pct     = data.get('context_window', {}).get('used_percentage')
-model   = data.get('model', {}).get('display_name', '-')
-cost    = data.get('cost', {}).get('total_cost_usd')
+# ── Data ───────────────────────────────────────────────────────────────────────
+
+data  = json.load(sys.stdin)
+ws    = data.get('workspace', {})
+cdir  = ws.get('current_dir', '')
+wt    = ws.get('git_worktree', '')
+sname = data.get('session_name', '')
+sid   = data.get('session_id', '')[:8]
+pct   = data.get('context_window', {}).get('used_percentage')
+model = data.get('model', {}).get('display_name', '-')
+cost  = data.get('cost', {}).get('total_cost_usd')
 
 width = term_width()
-now   = time.time()
-inner = max(2, width - 2)  # content width inside box borders
+inner = max(2, width - 2)
+tick  = int(time.time())
 
-# Starship: split at " via "
+# ── Build sections ─────────────────────────────────────────────────────────────
+
 raw = starship(cdir, width) if cdir else ''
 if ' via ' in raw:
     idx = raw.index(' via ')
@@ -117,37 +165,48 @@ if ' via ' in raw:
 else:
     s_main, s_via = raw, ''
 
-# Session line — marquee name to fit, keeping " · sid" intact
 wt_tag = f'[worktree: {wt}] ' if wt else ''
 if sname:
-    # fixed: 🧵(2) + space(1) + " · "(3) + sid(8) = 14 cols
-    name_budget = inner - display_width(wt_tag) - 14
-    sname_display = marquee(sname, max(1, name_budget), now)
-    session = f'🧵 \033[94m{sname_display}\033[0m · \033[38;5;208m{sid}\033[0m'
+    # 🧵(2) + space(1) + " · "(3) + sid(8) = 14 cols fixed
+    name_budget   = inner - display_width(wt_tag) - 14
+    sname_display = trunc_text(sname, max(1, name_budget))
+    session = (f'🧵 {c(col["session_name"])}{sname_display}{RST}'
+               f' · {c(col["session_id"])}{sid}{RST}')
 else:
-    session = f'🧵 \033[38;5;208m{sid}\033[0m'
+    session = f'🧵 {c(col["session_id"])}{sid}{RST}'
 
-# Model / cost / context line
 cost_s = f'${cost:.4f}' if cost is not None else '$-'
 if pct is not None:
     filled = round(pct / 10)
-    bar = '█' * filled + '░' * (10 - filled)
-    ctx_s = f'[{bar}] {pct:.0f}%'
+    bar    = '█' * filled + '░' * (10 - filled)
+    ctx_s  = f'[{bar}] {pct:.0f}%'
 else:
     ctx_s = '[░░░░░░░░░░] -%'
-suffix_s = f' 💸 \033[92m{cost_s}\033[0m 📊 \033[93m{ctx_s}\033[0m'
+suffix_s     = f' 💸 {c(col["cost"])}{cost_s}{RST} 📊 {c(col["context"])}{ctx_s}{RST}'
 model_budget = max(1, inner - 3 - display_width(suffix_s))
-model_display = marquee(model, model_budget, now)
-stats = f'🧠 \033[94m{model_display}\033[0m{suffix_s}'
+model_disp   = trunc_text(model, model_budget)
+stats        = f'🧠 {c(col["model"])}{model_disp}{RST}{suffix_s}'
 
-# Box output
-border = '─' * inner
-lines = [wt_tag + session]
-if s_main: lines.append(marquee(s_main, inner, now))
-if s_via:  lines.append(marquee(s_via, inner, now))
-lines.append(stats)
+# ── Assemble lines in configured order ────────────────────────────────────────
 
-print('┌' + border + '┐')
-for line in lines:
-    print('│' + ansi_trunc_pad(line, inner) + '│')
-print('└' + border + '┘')
+output_lines = []
+for line_type in cfg['lines']:
+    if line_type == 'session':
+        output_lines.append(wt_tag + session)
+    elif line_type == 'starship':
+        if s_main: output_lines.append(s_main)
+        if s_via:  output_lines.append(s_via)
+    elif line_type == 'stats':
+        output_lines.append(stats)
+
+# ── Print ──────────────────────────────────────────────────────────────────────
+
+if cfg['box']:
+    border = '─' * inner
+    print('┌' + border + '┐')
+    for idx, line in enumerate(output_lines):
+        print('│' + ansi_trunc_pad(line, inner, seed=(tick, idx)) + '│')
+    print('└' + border + '┘')
+else:
+    for idx, line in enumerate(output_lines):
+        print(ansi_trunc_pad(line, inner, seed=(tick, idx)))

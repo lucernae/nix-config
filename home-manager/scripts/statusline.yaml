@@ -1,0 +1,23 @@
+# Claude Code statusline configuration
+# Location: ~/.claude/statusline.yaml (symlinked from nix-config)
+
+box: true
+
+sparkles:
+  enabled: true
+  density: 8          # 1 sparkle per N padding columns
+  chars: ["✦", "✧", "⋆", "·"]
+  colors: [yellow, white, cyan, magenta]
+
+# Line order — available types: session, starship, stats
+lines:
+  - session
+  - starship
+  - stats
+
+colors:
+  session_name: bright_blue
+  session_id:   orange
+  model:        bright_blue
+  cost:         bright_green
+  context:      bright_yellow
