@@ -158,7 +158,16 @@ def format_duration(ms):
 
 # ── Starship ───────────────────────────────────────────────────────────────────
 
+def has_starship_config():
+    # STARSHIP_CONFIG env var being set means starship is integrated (home-manager sets it)
+    if os.environ.get('STARSHIP_CONFIG'):
+        return True
+    # Fallback: check default config location for manual installs
+    return os.path.isfile(os.path.expanduser('~/.config/starship.toml'))
+
 def starship(path, width=80):
+    if not has_starship_config():
+        return ''
     try:
         out = subprocess.run(
             ['starship', 'prompt', '--path', path, '--terminal-width', str(width)],
