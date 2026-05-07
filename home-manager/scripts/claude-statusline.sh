@@ -14,40 +14,30 @@ used_pct=$(printf '%s' "$input" | jq -r '.context_window.used_percentage // empt
 model=$(printf '%s' "$input" | jq -r '.model.display_name // empty')
 cost=$(printf '%s' "$input" | jq -r '.cost.total_cost_usd // empty')
 
-# --- Line 1: starship info line ---
+# --- Lines 1 & 3: starship split at " via " ---
+starship_main=""
+starship_via=""
 if [ -n "$current_dir" ]; then
-    STARSHIP_SHELL=bash starship prompt --path "$current_dir" 2>/dev/null \
-        | sed 's/\\\[//g; s/\\\]//g' \
+    starship_raw=$(STARSHIP_SHELL=bash starship prompt --path "$current_dir" 2>/dev/null \
+        | sed 's/\\\[//g; s/\\\]//g; s/\\\$/$/' \
         | grep . \
-        | head -1
-fi
-
-# --- Git branch ---
-branch=""
-if [ -n "$current_dir" ]; then
-    branch=$(git -C "$current_dir" symbolic-ref --short HEAD 2>/dev/null)
-fi
-if [ -z "$branch" ]; then
-    branch=$(git -C "$current_dir" rev-parse --short HEAD 2>/dev/null)
-fi
-if [ -z "$branch" ]; then
-    branch="(no git)"
+        | head -1)
+    starship_main=$(printf '%s' "$starship_raw" | sed 's/ via .*//')
+    starship_via=$(printf '%s' "$starship_raw" | sed -n 's/.* via /via /p')
 fi
 
 # --- Worktree tag ---
 worktree_tag=""
 if [ -n "$git_worktree" ]; then
-    worktree_tag=" [worktree: $git_worktree]"
+    worktree_tag="[worktree: $git_worktree] "
 fi
 
 # --- Session identifier ---
+short_id=$(printf '%s' "$session_id" | cut -c1-8)
 if [ -n "$session_name" ]; then
-    # Show both name and short ID
-    short_id=$(printf '%s' "$session_id" | cut -c1-8)
-    session_part="session: $session_name ($short_id)"
+    session_part=$(printf '🧵 \033[94m%s\033[0m · \033[38;5;208m%s\033[0m' "$session_name" "$short_id")
 else
-    short_id=$(printf '%s' "$session_id" | cut -c1-8)
-    session_part="$short_id"
+    session_part=$(printf '🧵 \033[38;5;208m%s\033[0m' "$short_id")
 fi
 
 # --- Model ---
@@ -67,6 +57,8 @@ else
     ctx_part="ctx: -"
 fi
 
-# --- Assemble output (two lines, table-aligned) ---
-printf '%-20s | %s\n' "$branch$worktree_tag" "$session_part"
+# --- Assemble output (four lines, table-aligned) ---
+printf '%s%s\n' "$worktree_tag" "$session_part"
+printf '%s\n' "$starship_main"
+printf '%s\n' "$starship_via"
 printf '%-20s | %-12s | %s\n' "$model_part" "$cost_part" "$ctx_part"
