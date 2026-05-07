@@ -19,7 +19,22 @@ icons:
   directory: "📂"
   branch:    "🌿"
 
-# Line order — available types: session, starship, stats
+# Line order — built-in types: session, starship, stats
+# Custom widgets: dict with icon, color, and one of:
+#   command: "shell command"        → first line of stdout
+#   text: "static string"           → literal text
+#   field: "cost.total_lines_added" → value from Claude Code JSON data
+#
+# Examples (uncomment to enable):
+#   - icon: "🗓"
+#     command: "date '+%a %b %d %H:%M'"
+#     color: bright_white
+#   - icon: "📍"
+#     field: workspace.project_dir
+#     color: bright_cyan
+#   - icon: "💬"
+#     text: "My custom note"
+#     color: bright_magenta
 lines:
   - session
   - starship

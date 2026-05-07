@@ -276,15 +276,46 @@ else:
     parts = [f'{icon} {c(col)}{val}{RST}' for icon, val, col in stat_elems]
 stats = ' '.join(parts)
 
+# ── Widget renderer ────────────────────────────────────────────────────────────
+
+def render_widget(w):
+    icon   = w.get('icon', '')
+    color  = ANSI.get(w.get('color', ''), '')
+    prefix = f'{icon} ' if icon else ''
+
+    if 'command' in w:
+        try:
+            out = subprocess.run(
+                w['command'], shell=True, capture_output=True, text=True, timeout=5
+            ).stdout.strip()
+            result = out.splitlines()[0] if out else ''
+        except Exception:
+            result = ''
+    elif 'text' in w:
+        result = str(w['text'])
+    elif 'field' in w:
+        val = data
+        for key in str(w['field']).split('.'):
+            val = val.get(key, '') if isinstance(val, dict) else ''
+        result = str(val) if val else ''
+    else:
+        result = ''
+
+    return f'{prefix}{color}{result}{RST}' if result else ''
+
 # ── Assemble lines in configured order ────────────────────────────────────────
 
 output_lines = []
-for line_type in cfg['lines']:
-    if line_type == 'session':
-        output_lines.append(wt_tag + session)
-    elif line_type == 'starship':
+for entry in cfg['lines']:
+    if isinstance(entry, dict):
+        line = render_widget(entry)
+        if line:
+            output_lines.append(line)
+    elif entry == 'session':
+        output_lines.append(session)
+    elif entry == 'starship':
         output_lines.extend(starship_lines)
-    elif line_type == 'stats':
+    elif entry == 'stats':
         output_lines.append(stats)
 
 # ── Print ──────────────────────────────────────────────────────────────────────
