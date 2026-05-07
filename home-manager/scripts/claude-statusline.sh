@@ -256,12 +256,10 @@ for line_type in cfg['lines']:
 
 if cfg['box']:
     border = '─' * inner
-    tl, tr = ('┐', '┌') if rtl else ('┌', '┐')
-    bl, br = ('┘', '└') if rtl else ('└', '┘')
-    print(tl + border + tr)
+    print('┌' + border + '┐')
     for idx, line in enumerate(output_lines):
         print('│' + ansi_trunc_pad(line, inner, seed=(tick, idx), rtl=rtl) + '│')
-    print(bl + border + br)
+    print('└' + border + '┘')
 else:
     for idx, line in enumerate(output_lines):
         print(ansi_trunc_pad(line, inner, seed=(tick, idx), rtl=rtl))
